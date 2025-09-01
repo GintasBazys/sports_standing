@@ -1,0 +1,29 @@
+@forward "mixins";
+@forward "variables";
+@forward "header";
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.header, .section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section {
+  margin: 2rem 0;
+}
+
+.container {
+  max-width: 1440px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
