@@ -18,38 +18,38 @@ const eslintConfig = config(
       "**/.temp/",
       "**/.tmp/",
       "**/.yarn/",
-      "**/coverage/",
-    ],
+      "**/coverage/"
+    ]
   },
   {
     name: `${js.meta.name}/recommended`,
-    ...js.configs.recommended,
+    ...js.configs.recommended
   },
   configs.strictTypeChecked,
   configs.stylisticTypeChecked,
   vitestPlugin.configs.recommended,
   {
     name: "eslint-plugin-react/jsx-runtime",
-    ...reactPlugin.configs.flat["jsx-runtime"],
+    ...reactPlugin.configs.flat["jsx-runtime"]
   },
   reactHooksPlugin.configs["recommended-latest"],
   {
     name: "main",
     linterOptions: {
-      reportUnusedDisableDirectives: 2,
+      reportUnusedDisableDirectives: 2
     },
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
       parserOptions: {
         projectService: true,
-        tsconfigRootDir: import.meta.dirname,
-      },
+        tsconfigRootDir: import.meta.dirname
+      }
     },
     settings: {
       vitest: {
-        typecheck: true,
-      },
+        typecheck: true
+      }
     },
     rules: {
       "no-undef": [0],
@@ -59,13 +59,13 @@ const eslintConfig = config(
         {
           prefer: "type-imports",
           fixStyle: "separate-type-imports",
-          disallowTypeAnnotations: true,
-        },
-      ],
-    },
+          disallowTypeAnnotations: true
+        }
+      ]
+    }
   },
 
-  prettierConfig,
+  prettierConfig
 )
 
 export default eslintConfig

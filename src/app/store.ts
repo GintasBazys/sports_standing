@@ -1,19 +1,29 @@
-import { combineSlices, configureStore } from "@reduxjs/toolkit"
-import { setupListeners } from "@reduxjs/toolkit/query"
+import { configureStore, combineSlices } from "@reduxjs/toolkit"
+import { teamPlayerSlice } from "@/features/team-creator/teamPlayerSlice.ts"
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist"
+import storage from "redux-persist/lib/storage"
 
-const rootReducer = combineSlices()
-export type RootState = ReturnType<typeof rootReducer>
+const rootReducer = combineSlices(teamPlayerSlice)
 
-export const makeStore = (preloadedState?: Partial<RootState>) => {
-  const store = configureStore({
-    reducer: rootReducer,
-    preloadedState
-  })
-  setupListeners(store.dispatch)
-  return store
+const persistConfig = {
+  key: "root",
+  storage
 }
 
-export const store = makeStore()
+const persistedReducer = persistReducer(persistConfig, rootReducer)
 
+export const store = configureStore({
+  reducer: persistedReducer,
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+      }
+    })
+})
+
+export const persistor = persistStore(store)
+
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
 export type AppStore = typeof store
-export type AppDispatch = AppStore["dispatch"]

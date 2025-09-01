@@ -1,20 +1,9 @@
-import { Outlet } from "react-router"
-import type { ReactNode } from "react"
-import { HeaderComponent } from "@/app/components/header/HeaderComponent.tsx"
-
-function Layout({ children }: { children: ReactNode }) {
-  return (
-    <>
-      <HeaderComponent />
-      <main>{children}</main>
-    </>
-  )
-}
+import TournamentCards from "@/app/components/tournaments/TournamentCards.tsx"
 
 export default function App() {
   return (
-    <Layout>
-      <Outlet />
-    </Layout>
+    <main>
+      <TournamentCards />
+    </main>
   )
 }
