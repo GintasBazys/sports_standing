@@ -1,5 +1,6 @@
-@forward "mixins";
+@use "mixins" as *;
 @forward "variables";
+@forward "theme/card";
 
 * {
   box-sizing: border-box;
@@ -7,12 +8,11 @@
 
 body {
   margin: 0;
+  font-family: Inter, sans-serif;
 }
 
 .header, .section {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  @include flex-center;
 }
 
 .section {
@@ -21,13 +21,22 @@ body {
 
 .container {
   max-width: 1440px;
-  padding: 0 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 1.25rem;
+  margin: 0 auto;
+  @include flex-center;
+  flex-direction: column;
 }
 
-main {
+.grid {
+  margin: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
+  @include media-max(lg) {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+h1, h2 {
+  margin-top: 0;
 }

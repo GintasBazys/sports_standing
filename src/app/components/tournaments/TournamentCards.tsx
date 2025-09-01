@@ -11,7 +11,7 @@ export default function TournamentCards() {
         <section key={tournament.title} className={`layout-${tournament.layout} section`}>
           <div className="container">
             <div className="card">
-              <h1>{tournament.title}</h1>
+              <h2>{tournament.title}</h2>
               <TeamPlayerCreator />
               <ScoreCreator />
               <ScoringTable />

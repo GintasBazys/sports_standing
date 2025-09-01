@@ -1,0 +1,14 @@
+@use "variables";
+@use "sass:map";
+
+@mixin media-max($size) {
+  @media screen and (max-width: (map.get(variables.$breakpoints, $size))) {
+    @content;
+  }
+}
+
+@mixin flex-center() {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

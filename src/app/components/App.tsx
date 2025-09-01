@@ -2,8 +2,11 @@ import TournamentCards from "@/app/components/tournaments/TournamentCards.tsx"
 
 export default function App() {
   return (
-    <main>
-      <TournamentCards />
+    <main className="container">
+      <h1>Sports Standing App</h1>
+      <div className="grid">
+        <TournamentCards />
+      </div>
     </main>
   )
 }
