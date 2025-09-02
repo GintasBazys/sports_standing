@@ -4,15 +4,32 @@ table {
   width: 100%;
   min-width: 320px;
   border-collapse: collapse;
-  th, td {
+
+  thead th {
+    position: sticky;
+    top: 0;
+    background-color: green;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f9fafb;
+  }
+
+  tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
+  th,
+  td {
     border: 1px solid black;
-    padding: 5px;
+    padding: 0.5rem;
     text-align: left;
   }
 }
 
 .scrollable-x {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 22rem;
 }
 
 .grid {
