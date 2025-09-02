@@ -1,0 +1,38 @@
+@use "@/assets/styles/mixins" as *;
+
+table {
+  width: 100%;
+  min-width: 320px;
+  border-collapse: collapse;
+  th, td {
+    border: 1px solid black;
+    padding: 5px;
+    text-align: left;
+  }
+}
+
+.scrollable-x {
+  overflow-x: auto;
+}
+
+.grid {
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  width: 100%;
+
+  @include media-max(lg) {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+h1, h2 {
+  margin-top: 0;
+}
+
+h1 {
+  text-align: center;
+  text-transform: uppercase;
+}

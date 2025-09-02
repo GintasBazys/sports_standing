@@ -61,11 +61,28 @@ const eslintConfig = config(
           fixStyle: "separate-type-imports",
           disallowTypeAnnotations: true
         }
+      ],
+      "padding-line-between-statements": [
+        "error",
+        { blankLine: "always", prev: "*", next: "return" },
+        { blankLine: "always", prev: "import", next: "*" },
+        { blankLine: "any", prev: "import", next: "import" },
+        { blankLine: "always", prev: ["const", "let", "var"], next: "*" },
+        { blankLine: "any", prev: ["const", "let", "var"], next: ["const", "let", "var"] },
+        { blankLine: "always", prev: "block-like", next: "*" }
       ]
     }
   },
 
-  prettierConfig
+  prettierConfig,
+  {
+    name: "after-prettier",
+    rules: {
+      "brace-style": ["error", "1tbs", { allowSingleLine: false }],
+      curly: ["error", "all"],
+      "max-statements-per-line": ["error", { max: 1 }]
+    }
+  }
 )
 
 export default eslintConfig
