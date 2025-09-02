@@ -1,14 +1,21 @@
-import { type FormEvent, useState, useRef } from "react"
+import { type FormEvent, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { addTeamOrPlayer, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import { normalizeName } from "@/app/utils/normalizeName"
 import type { RootState } from "@/app/store.ts"
+import type { LayoutSettings } from "@/app/types/tournament.ts"
+import { ParticipantTypes } from "@/app/enumerators/participant.ts"
+import { TEXT } from "@/app/constants/text.ts"
 
-export default function ParticipantsCreator({ tournament }: { tournament: string }) {
+type Props = { tournament: string; settings: LayoutSettings }
+
+export default function ParticipantsCreator({ tournament, settings }: Props) {
   const dispatch = useDispatch()
   const standings = useSelector((state: RootState) => selectStandings(state, tournament))
   const inputRef = useRef<HTMLInputElement>(null)
   const [error, setError] = useState<string | null>(null)
+
+  const translationKey = settings.showAddPlayer ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   const onAddTeam = (e: FormEvent) => {
     e.preventDefault()
@@ -22,7 +29,7 @@ export default function ParticipantsCreator({ tournament }: { tournament: string
     const normalized = normalizeName(raw)
 
     if (!normalized) {
-      setError("Please enter a team name")
+      setError(TEXT.participants.errors.empty[translationKey])
       el.focus()
 
       return
@@ -31,7 +38,7 @@ export default function ParticipantsCreator({ tournament }: { tournament: string
     const exists = standings.some(t => normalizeName(t.name) === normalized)
 
     if (exists) {
-      setError("That team name already exists")
+      setError(TEXT.participants.errors.duplicate[translationKey])
       el.select()
       el.focus()
 
@@ -45,10 +52,10 @@ export default function ParticipantsCreator({ tournament }: { tournament: string
 
   return (
     <div>
-      <h2>Create Team</h2>
+      <h2>{TEXT.participants.title[translationKey]}</h2>
       <form onSubmit={onAddTeam}>
-        <input ref={inputRef} placeholder="Team name" />
-        <button type="submit">Add Team</button>
+        <input ref={inputRef} placeholder={TEXT.participants.placeholder[translationKey]} />
+        <button type="submit">{TEXT.participants.addBtn[translationKey]}</button>
       </form>
 
       {error && (
