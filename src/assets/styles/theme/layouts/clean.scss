@@ -1,0 +1,58 @@
+.layout-clean {
+  --bg: #f7f9fc;
+  --surface: #ffffff;
+  --surface-2: #fbfdff;
+  --fg: #0f172a;
+  --muted: #64748b;
+  --border: #e5e7eb;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(15,23,42,.06);
+
+  --accent: #3b82f6;
+  --accent-600: #2563eb;
+  --accent-50: #eff6ff;
+
+  --input-bg: #ffffff;
+  --input-fg: var(--fg);
+  --input-border: #d1d5db;
+  --input-border-focus: var(--accent);
+  --input-placeholder: #9ca3af;
+  --input-error: #dc2626;
+
+  --btn-radius: 10px;
+  --btn-padding-y: 0.5rem;
+  --btn-padding-x: 0.9rem;
+  --btn-primary-bg: var(--accent);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-border: var(--accent);
+  --btn-primary-hover-bg: var(--accent-600);
+  --btn-primary-ring: rgba(59,130,246,.35);
+  --btn-secondary-bg: var(--surface);
+  --btn-secondary-fg: var(--fg);
+  --btn-secondary-border: var(--border);
+  --btn-secondary-hover-bg: #f8fafc;
+  --btn-secondary-ring: rgba(15,23,42,.1);
+
+  --focus-ring: rgba(59,130,246,.25);
+
+  --card-bg: var(--surface);
+  --card-title-bg: var(--accent);
+  --card-text: var(--surface);
+  --card-border: var(--border);
+  --card-shadow: var(--shadow);
+  --card-radius: 12px;
+
+  --table-border: var(--border);
+  --table-cell-border: var(--border);
+  --table-radius: 10px;
+  --table-head-bg: var(--accent-50);
+  --table-head-fg: #0b2a6b;
+  --table-row-odd-bg: #ffffff;
+  --table-row-even-bg: #fafafa;
+  --table-row-hover-bg: #f4f8ff;
+
+  --scrollbar-track: #f1f1f1;
+  --scrollbar-thumb: #d1d5db;
+
+  font-family: "Inter",sans-serif;
+  color: var(--fg);
+}

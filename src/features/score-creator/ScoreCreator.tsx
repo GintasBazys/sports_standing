@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react"
+import { useMemo, useRef, useState, type FormEvent, type RefObject } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
   createMatch,
@@ -9,6 +9,8 @@ import {
 } from "@/features/score-creator/scoresSlice.ts"
 import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import type { RootState } from "@/app/store"
+import NumberInput from "@/app/components/inputs/NumberInput.tsx"
+import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
 
 export default function ScoreCreator({ tournament }: { tournament: string }) {
   const dispatch = useDispatch()
@@ -16,18 +18,32 @@ export default function ScoreCreator({ tournament }: { tournament: string }) {
 
   const [homeId, setHomeId] = useState("")
   const [awayId, setAwayId] = useState("")
-  const [homeScore, setHomeScore] = useState("0")
-  const [awayScore, setAwayScore] = useState("0")
   const [error, setError] = useState<string | null>(null)
 
-  const options = useMemo(() => teams.map(t => ({ id: t.id, name: t.name })), [teams])
+  const homeScoreRef = useRef<HTMLInputElement | null>(null)
+  const awayScoreRef = useRef<HTMLInputElement | null>(null)
+
+  const options = useMemo<{ id: string; name: string }[]>(() => teams.map(t => ({ id: t.id, name: t.name })), [teams])
   const readyForScores = homeId && awayId && homeId !== awayId
 
-  const alreadyPlayed = useSelector((state: RootState) => selectHasPlayed(state, tournament, homeId, awayId))
+  const alreadyPlayed = useSelector<RootState, boolean>(state => selectHasPlayed(state, tournament, homeId, awayId))
 
-  const opponentsPlayedByHome = useSelector((state: RootState) => selectOpponentsPlayed(state, tournament, homeId))
+  const opponentsPlayedByHome = useSelector<RootState, Set<string>>(state =>
+    selectOpponentsPlayed(state, tournament, homeId)
+  )
 
-  const onSubmit = (e: FormEvent) => {
+  function readClampedScore(ref: RefObject<HTMLInputElement | null>, max = 99): number {
+    const raw = Number(ref.current?.value)
+    const n = Math.trunc(raw)
+
+    if (Number.isNaN(n)) {
+      return 0
+    }
+
+    return Math.max(0, Math.min(max, n))
+  }
+
+  function onSubmit(e: FormEvent): void {
     e.preventDefault()
 
     if (!readyForScores) {
@@ -42,8 +58,8 @@ export default function ScoreCreator({ tournament }: { tournament: string }) {
       return
     }
 
-    const h = Math.max(0, Math.trunc(Number(homeScore)))
-    const a = Math.max(0, Math.trunc(Number(awayScore)))
+    const h = readClampedScore(homeScoreRef, 99)
+    const a = readClampedScore(awayScoreRef, 99)
 
     const create = createMatch(tournament, homeId, awayId)
 
@@ -56,26 +72,32 @@ export default function ScoreCreator({ tournament }: { tournament: string }) {
 
     setHomeId("")
     setAwayId("")
-    setHomeScore("0")
-    setAwayScore("0")
+    if (homeScoreRef.current) {
+      homeScoreRef.current.value = "0"
+    }
+
+    if (awayScoreRef.current) {
+      awayScoreRef.current.value = "0"
+    }
+
     setError(null)
   }
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-xl font-semibold">Add Result</h2>
+    <div className="card__element">
+      <h2>Add Result</h2>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <div className="flex flex-wrap gap-2 items-center">
-          <label className="w-20">Home</label>
+      <form onSubmit={onSubmit}>
+        <div>
+          <label htmlFor={`homeOptions-${tournament}`}>Home</label>
           <select
+            id={`homeOptions-${tournament}`}
             value={homeId}
             onChange={e => {
               setHomeId(e.target.value)
               setError(null)
             }}
             disabled={options.length === 0}
-            className="min-w-48 border rounded-lg p-2"
           >
             <option value="" disabled>
               Select team
@@ -86,17 +108,14 @@ export default function ScoreCreator({ tournament }: { tournament: string }) {
               </option>
             ))}
           </select>
-
-          <span className="opacity-70">vs</span>
-
-          <label className="w-20">Away</label>
+          <label htmlFor={`awayOptions-${tournament}`}>Away</label>
           <select
             value={awayId}
+            id={`awayOptions-${tournament}`}
             onChange={e => {
               setAwayId(e.target.value)
               setError(null)
             }}
-            className="min-w-48 border rounded-lg p-2"
             disabled={!homeId}
           >
             <option value="" disabled>
@@ -113,46 +132,41 @@ export default function ScoreCreator({ tournament }: { tournament: string }) {
             ))}
           </select>
         </div>
-
         {readyForScores && (
-          <div className="flex gap-3 items-center">
-            <input
-              type="number"
-              min={0}
-              step={1}
-              value={homeScore}
-              onChange={e => {
-                setHomeScore(e.target.value)
-              }}
-              className="w-16 text-center border rounded-lg p-2"
-              aria-label="Home score"
-            />
-            <span>:</span>
-            <input
-              type="number"
-              min={0}
-              step={1}
-              value={awayScore}
-              onChange={e => {
-                setAwayScore(e.target.value)
-              }}
-              className="w-16 text-center border rounded-lg p-2"
-              aria-label="Away score"
-            />
-
-            <button
+          <>
+            <div className="row">
+              <NumberInput
+                id={`homeScore-${tournament}`}
+                ref={homeScoreRef}
+                min={0}
+                max={99}
+                step={1}
+                defaultValue="0"
+                aria-label="Home score"
+              />
+              <span>&nbsp;:&nbsp;</span>
+              <NumberInput
+                id={`awayScore-${tournament}`}
+                ref={awayScoreRef}
+                min={0}
+                max={99}
+                step={1}
+                defaultValue="0"
+                aria-label="Away score"
+              />
+            </div>
+            <PrimaryButton
+              className="btn--full-width"
               type="submit"
-              className="ml-3 border rounded-lg px-3 py-2 hover:bg-gray-50"
               disabled={alreadyPlayed}
               title={alreadyPlayed ? "These teams have already played." : undefined}
             >
               Save Result
-            </button>
-          </div>
+            </PrimaryButton>
+          </>
         )}
-
         {error && (
-          <p role="alert" className="text-red-600 text-sm">
+          <p role="alert" style={{ color: "crimson", marginTop: 8 }}>
             {error}
           </p>
         )}

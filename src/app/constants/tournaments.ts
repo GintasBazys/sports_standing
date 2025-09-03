@@ -13,7 +13,7 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
     showAddTeam: true,
     showAddPlayer: false,
     showStandings: true,
-    showMatchResults: true,
+    showMatchResults: false,
     showButtons: false,
     showFlags: false,
     showIcons: false,

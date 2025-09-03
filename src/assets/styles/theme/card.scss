@@ -1,14 +1,38 @@
 .card {
   text-align: center;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-  height: 100%;
+  border-radius: var(--card-radius, 10px);
+  box-shadow: var(--card-shadow);
+  background: var(--card-bg);
 
   &__title {
     padding: 16px;
-    background: chartreuse;
+    border-top-left-radius: var(--card-radius, 10px);
+    border-top-right-radius: var(--card-radius, 10px);
+    background: var(--card-title-bg);
+    border-bottom: 1px solid var(--card-border);
+    color: var(--card-text);
     h2 {
       margin-bottom: 0;
+    }
+  }
+
+  &__element {
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    padding: 1rem 1rem 0;
+    margin: 0 0 1rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 0 1rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    .btn {
+      flex-grow: 1;
     }
   }
 

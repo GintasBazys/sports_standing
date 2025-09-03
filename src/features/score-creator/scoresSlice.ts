@@ -1,29 +1,12 @@
 import { createSlice, createSelector, nanoid, type PayloadAction } from "@reduxjs/toolkit"
 import type { RootState } from "@/app/store"
-
-type MatchEntry = {
-  id: string
-  tournamentId: string
-  homeId: string
-  awayId: string
-  homeScore: number | null
-  awayScore: number | null
-}
-
-type TournamentData = {
-  matches: Record<string, MatchEntry | undefined>
-  matchOrder: string[]
-}
-
-export type ScoresState = {
-  byTournament: Partial<Record<string, TournamentData>>
-}
+import type { MatchData, ScoresState } from "@/app/types/scores.ts"
 
 const initialState: ScoresState = { byTournament: {} }
 
-const makePairKey = (a: string, b: string) => [a, b].sort().join("::")
+const makePairKey = (teamAId: string, teamBId: string) => [teamAId, teamBId].sort().join("::")
 
-const getOrCreateTournamentBucket = (state: ScoresState, tournamentId: string): TournamentData => {
+const getOrCreateTournamentData = (state: ScoresState, tournamentId: string): MatchData => {
   return state.byTournament[tournamentId] ?? (state.byTournament[tournamentId] = { matches: {}, matchOrder: [] })
 }
 
@@ -42,24 +25,24 @@ export const scoresSlice = createSlice({
           return
         }
 
-        const bucket = getOrCreateTournamentBucket(state, tournamentId)
+        const tournamentData = getOrCreateTournamentData(state, tournamentId)
         const pairKey = makePairKey(homeId, awayId)
 
-        const exists = bucket.matchOrder.some(existingId => {
-          const m = bucket.matches[existingId]
+        const alreadyExists = tournamentData.matchOrder.some(existingMatchId => {
+          const existingMatch = tournamentData.matches[existingMatchId]
 
-          if (!m) {
+          if (!existingMatch) {
             return
           }
 
-          return makePairKey(m.homeId, m.awayId) === pairKey
+          return makePairKey(existingMatch.homeId, existingMatch.awayId) === pairKey
         })
 
-        if (exists) {
+        if (alreadyExists) {
           return
         }
 
-        bucket.matches[matchId] = {
+        tournamentData.matches[matchId] = {
           id: matchId,
           tournamentId,
           homeId,
@@ -67,7 +50,7 @@ export const scoresSlice = createSlice({
           homeScore: null,
           awayScore: null
         }
-        bucket.matchOrder.push(matchId)
+        tournamentData.matchOrder.push(matchId)
       }
     ),
 
@@ -77,13 +60,13 @@ export const scoresSlice = createSlice({
       }),
       (state, action: PayloadAction<{ tournamentId: string; matchId: string; homeScore: number }>) => {
         const { tournamentId, matchId, homeScore } = action.payload
-        const match = state.byTournament[tournamentId]?.matches[matchId]
+        const matchEntry = state.byTournament[tournamentId]?.matches[matchId]
 
-        if (!match) {
+        if (!matchEntry) {
           return
         }
 
-        match.homeScore = Math.max(0, Math.trunc(homeScore))
+        matchEntry.homeScore = Math.max(0, Math.trunc(homeScore))
       }
     ),
 
@@ -93,13 +76,13 @@ export const scoresSlice = createSlice({
       }),
       (state, action: PayloadAction<{ tournamentId: string; matchId: string; awayScore: number }>) => {
         const { tournamentId, matchId, awayScore } = action.payload
-        const match = state.byTournament[tournamentId]?.matches[matchId]
+        const matchEntry = state.byTournament[tournamentId]?.matches[matchId]
 
-        if (!match) {
+        if (!matchEntry) {
           return
         }
 
-        match.awayScore = Math.max(0, Math.trunc(awayScore))
+        matchEntry.awayScore = Math.max(0, Math.trunc(awayScore))
       }
     )
   })
@@ -109,7 +92,7 @@ export const { createMatch, addHomeScore, addAwayScore } = scoresSlice.actions
 export default scoresSlice.reducer
 
 const selectScoresState = (state: RootState) => state.scores
-const selectByTournament = createSelector(selectScoresState, s => s.byTournament)
+const selectByTournament = createSelector(selectScoresState, scoresState => scoresState.byTournament)
 
 const selectTournamentId = (_: RootState, tournamentId?: string) => tournamentId
 const selectFirstTeamId = (_: RootState, __?: string, firstTeamId?: string) => firstTeamId
@@ -121,13 +104,13 @@ export const selectMatches = createSelector([selectByTournament, selectTournamen
     return []
   }
 
-  const bucket = byTournament[tournamentId]
+  const tournamentData = byTournament[tournamentId]
 
-  if (!bucket) {
+  if (!tournamentData) {
     return []
   }
 
-  return bucket.matchOrder.map(id => bucket.matches[id])
+  return tournamentData.matchOrder.map(matchId => tournamentData.matches[matchId])
 })
 
 export const selectHasPlayed = createSelector(
@@ -137,22 +120,22 @@ export const selectHasPlayed = createSelector(
       return false
     }
 
-    const bucket = byTournament[tournamentId]
+    const tournamentData = byTournament[tournamentId]
 
-    if (!bucket) {
+    if (!tournamentData) {
       return false
     }
 
-    const key = makePairKey(firstTeamId, secondTeamId)
+    const teamPairKey = makePairKey(firstTeamId, secondTeamId)
 
-    return bucket.matchOrder.some(id => {
-      const m = bucket.matches[id]
+    return tournamentData.matchOrder.some(matchId => {
+      const matchEntry = tournamentData.matches[matchId]
 
-      if (!m) {
+      if (!matchEntry) {
         return false
       }
 
-      return makePairKey(m.homeId, m.awayId) === key
+      return makePairKey(matchEntry.homeId, matchEntry.awayId) === teamPairKey
     })
   }
 )
@@ -166,23 +149,23 @@ export const selectOpponentsPlayed = createSelector(
       return opponents
     }
 
-    const bucket = byTournament[tournamentId]
+    const tournamentData = byTournament[tournamentId]
 
-    if (!bucket) {
+    if (!tournamentData) {
       return opponents
     }
 
-    bucket.matchOrder.forEach(id => {
-      const m = bucket.matches[id]
+    tournamentData.matchOrder.forEach(matchId => {
+      const matchEntry = tournamentData.matches[matchId]
 
-      if (!m) {
+      if (!matchEntry) {
         return
       }
 
-      if (m.homeId === teamId) {
-        opponents.add(m.awayId)
-      } else if (m.awayId === teamId) {
-        opponents.add(m.homeId)
+      if (matchEntry.homeId === teamId) {
+        opponents.add(matchEntry.awayId)
+      } else if (matchEntry.awayId === teamId) {
+        opponents.add(matchEntry.homeId)
       }
     })
 

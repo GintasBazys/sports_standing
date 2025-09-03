@@ -2,6 +2,9 @@
 @forward "variables";
 @forward "theme/card";
 @forward "theme/base";
+@forward "theme/layouts/clean";
+@forward "theme/layouts/energetic";
+@forward "theme/layouts/table";
 
 * {
   box-sizing: border-box;
@@ -10,10 +13,27 @@
 body {
   margin: 0;
   font-family: Inter, sans-serif;
+  position: relative;
+  min-height: 100vh;
+  background: url("@/assets/images/bg-sport.webp") no-repeat center center fixed;
+  background-size: cover;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+  }
 }
 
-.section {
-  margin: 0 0 2rem;
+:root {
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #bbb;
+}
+
+#root {
+  position: relative;
 }
 
 .container {

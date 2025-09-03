@@ -1,0 +1,60 @@
+.layout-energetic {
+  --bg: #090f1b;
+  --surface: #0d1628;
+  --surface-2: #0b1423;
+  --fg: #e6edf3;
+  --muted: #a3b0c2;
+  --border: #1e293b;
+  --shadow: 0 6px 24px rgba(0,0,0,.45);
+
+  --accent: #16a34a;
+  --accent-700: #15803d;
+  --accent-2: #f97316;
+  --accent-2-700: #ea580c;
+
+  --input-bg: #0b1423;
+  --input-fg: var(--fg);
+  --input-border: #3f5577;
+  --input-border-focus: var(--accent);
+  --input-placeholder: #8ea0b6;
+  --input-error: #f43f5e;
+
+  --btn-radius: 999px;
+  --btn-padding-y: 0.6rem;
+  --btn-padding-x: 1rem;
+
+  --btn-primary-bg: var(--accent);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-border: var(--accent);
+  --btn-primary-hover-bg: var(--accent-700);
+  --btn-primary-ring: rgba(22,163,74,.35);
+
+  --btn-secondary-bg: var(--accent-2);
+  --btn-secondary-fg: var(--btn-primary-fg);
+  --btn-secondary-border: var(--accent-2);
+  --btn-secondary-hover-bg: var(--accent-2-700);
+  --btn-secondary-ring: rgba(249,115,22,.35);
+
+  --focus-ring: rgba(22,163,74,.28);
+
+  --card-bg: var(--surface);
+  --card-title-bg: var(--accent-2);
+  --card-border: #22314a;
+  --card-shadow: var(--shadow);
+  --card-radius: 16px;
+
+  --table-border: #22314a;
+  --table-cell-border: #22314a;
+  --table-radius: 12px;
+  --table-head-bg: var(--accent);
+  --table-head-fg: #052911;
+  --table-row-odd-bg: #0f172a;
+  --table-row-even-bg: #0c1527;
+  --table-row-hover-bg: #0e2d1f;
+
+  --scrollbar-track: #0e1526;
+  --scrollbar-thumb: var(--accent);
+
+  font-family: "Montserrat", sans-serif;
+  color: var(--fg);
+}

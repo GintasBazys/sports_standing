@@ -21,3 +21,5 @@ export type TournamentSettings = {
   tournament: string
   layout: Layout
 }
+
+export type TournamentProps = { tournament: string; settings: LayoutSettings | undefined }

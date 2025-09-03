@@ -1,0 +1,61 @@
+.layout-table {
+  --bg: #f6f7fb;
+  --surface: #ffffff;
+  --surface-2: #f0f2f8;
+  --fg: #0b1220;
+  --muted: #55627a;
+  --border: #d9dde7;
+  --shadow: 0 1px 2px rgba(7,14,28,.04), 0 10px 24px rgba(7,14,28,.06);
+
+  --accent: #0d9488;
+  --accent-600: #0f766e;
+
+  --input-bg: #ffffff;
+  --input-fg: var(--fg);
+  --input-border: var(--border);
+  --input-border-focus: var(--accent);
+  --input-placeholder: #8a93a5;
+  --input-error: #e11d48;
+
+  --btn-radius: 8px;
+  --btn-padding-y: 0.45rem;
+  --btn-padding-x: 0.75rem;
+  --btn-primary-bg: var(--accent);
+  --btn-primary-fg: #ffffff;
+  --btn-primary-border: var(--accent);
+  --btn-primary-hover-bg: var(--accent-600);
+  --btn-primary-ring: rgba(13,148,136,.35);
+  --btn-secondary-bg: var(--surface);
+  --btn-secondary-fg: var(--fg);
+  --btn-secondary-border: var(--border);
+  --btn-secondary-hover-bg: #ecfdf5;
+  --btn-secondary-ring: rgba(13,148,136,.15);
+
+  --focus-ring: rgba(13,148,136,.25);
+
+  --card-bg: var(--surface);
+  --card-title-bg: var(--surface-2);
+  --card-text: var(--fg);
+  --card-border: var(--border);
+  --card-shadow: var(--shadow);
+  --card-radius: 10px;
+
+  --table-border: var(--border);
+  --table-cell-border: var(--border);
+  --table-radius: 8px;
+  --table-head-bg: #ecfdf5;
+  --table-head-fg: #0b1220;
+  --table-row-odd-bg: #ffffff;
+  --table-row-even-bg: #f9fbff;
+  --table-row-hover-bg: #f0fdfa;
+
+  --scrollbar-track: #eef1f6;
+  --scrollbar-thumb: #c9cfdb;
+
+  --row-h: 42px;
+  --cell-px: 12px;
+  --cell-py: 8px;
+
+  font-family: "Space Mono", sans-serif;
+  color: var(--fg);
+}

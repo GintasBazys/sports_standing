@@ -10,7 +10,7 @@ export const participantsSlice = createSlice({
   name: "participant",
   initialState,
   reducers: create => ({
-    addTeamOrPlayer: create.preparedReducer(
+    addParticipant: create.preparedReducer(
       (name: string, tournamentId: string) => {
         const trimmed = name.trim()
 
@@ -139,5 +139,5 @@ export const selectStandings = createSelector(
   }
 )
 
-export const { addTeamOrPlayer, recordResult } = participantsSlice.actions
+export const { addParticipant, recordResult } = participantsSlice.actions
 export default participantsSlice.reducer

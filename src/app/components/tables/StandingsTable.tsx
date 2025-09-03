@@ -1,25 +1,23 @@
-import { useEffect, useRef, useCallback } from "react"
 import { useSelector } from "react-redux"
 import { selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import type { RootState } from "@/app/store"
-import type { LayoutSettings } from "@/app/types/tournament.ts"
-import { TEXT } from "@/app/constants/text.ts"
+import type { TournamentProps } from "@/app/types/tournament.ts"
+import translations from "@/app/translations/en.json"
 import { ParticipantTypes } from "@/app/enumerators/participant.ts"
+import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
 
-type Props = { tournament: string; settings: LayoutSettings }
-
-export default function StandingsTable({ tournament, settings }: Props) {
+export default function StandingsTable({ tournament, settings }: TournamentProps) {
   const standings = useSelector((state: RootState) => selectStandings(state, tournament))
 
-  const isPlayersOnly = settings.showAddPlayer && !settings.showAddTeam
+  const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   const visibleCols = {
-    played: settings.showPlayed,
-    wins: settings.showWins,
-    draws: settings.showDraws,
-    losses: settings.showLosses,
-    points: settings.showPoints
+    played: settings?.showPlayed,
+    wins: settings?.showWins,
+    draws: settings?.showDraws,
+    losses: settings?.showLosses,
+    points: settings?.showPoints
   }
 
   const colCount =
@@ -30,53 +28,21 @@ export default function StandingsTable({ tournament, settings }: Props) {
     Number(visibleCols.losses) +
     Number(visibleCols.points)
 
-  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map())
-  const setRowRef = useCallback(
-    (id: string) => (el: HTMLTableRowElement | null) => {
-      if (el) {
-        rowRefs.current.set(id, el)
-      } else {
-        rowRefs.current.delete(id)
-      }
-    },
-    []
-  )
-
-  const prevIdsRef = useRef<Set<string>>(new Set(standings.map(r => r.id)))
-
-  useEffect(() => {
-    const currIds = new Set(standings.map(r => r.id))
-    const added: string[] = []
-
-    currIds.forEach(id => {
-      if (!prevIdsRef.current.has(id)) {
-        added.push(id)
-      }
-    })
-
-    if (added.length) {
-      const targetId = added[added.length - 1] ?? ""
-      const node = rowRefs.current.get(targetId)
-
-      node?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" })
-    }
-
-    prevIdsRef.current = currIds
-  }, [standings])
+  const setRowRef = useAutoScroll(standings)
 
   return (
     <>
-      <h3>{TEXT.headings.standings}</h3>
+      <h3>{translations.headings.standings}</h3>
       <div className="scrollable-x">
         <table>
           <thead>
             <tr>
-              <th>{TEXT.headers.name[translationKey]}</th>
-              {visibleCols.played && <th>{TEXT.headers.played[translationKey]}</th>}
-              {visibleCols.wins && <th>{TEXT.headers.wins}</th>}
-              {visibleCols.draws && <th>{TEXT.headers.draws}</th>}
-              {visibleCols.losses && <th>{TEXT.headers.losses}</th>}
-              {visibleCols.points && <th>{TEXT.headers.points}</th>}
+              <th>{translations.headers.name[translationKey]}</th>
+              {visibleCols.played && <th>{translations.headers.played[translationKey]}</th>}
+              {visibleCols.wins && <th>{translations.headers.wins}</th>}
+              {visibleCols.draws && <th>{translations.headers.draws}</th>}
+              {visibleCols.losses && <th>{translations.headers.losses}</th>}
+              {visibleCols.points && <th>{translations.headers.points}</th>}
             </tr>
           </thead>
           <tbody>
@@ -94,7 +60,7 @@ export default function StandingsTable({ tournament, settings }: Props) {
             {standings.length === 0 && (
               <tr>
                 <td style={{ textAlign: "center" }} colSpan={colCount}>
-                  {TEXT.empty[translationKey]}
+                  {translations.empty[translationKey]}
                 </td>
               </tr>
             )}
