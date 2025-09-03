@@ -1,5 +1,4 @@
 import js from "@eslint/js"
-import vitestPlugin from "@vitest/eslint-plugin"
 import prettierConfig from "eslint-config-prettier/flat"
 import reactPlugin from "eslint-plugin-react"
 import reactHooksPlugin from "eslint-plugin-react-hooks"
@@ -27,7 +26,6 @@ const eslintConfig = config(
   },
   configs.strictTypeChecked,
   configs.stylisticTypeChecked,
-  vitestPlugin.configs.recommended,
   {
     name: "eslint-plugin-react/jsx-runtime",
     ...reactPlugin.configs.flat["jsx-runtime"]
@@ -44,11 +42,6 @@ const eslintConfig = config(
       parserOptions: {
         projectService: true,
         tsconfigRootDir: import.meta.dirname
-      }
-    },
-    settings: {
-      vitest: {
-        typecheck: true
       }
     },
     rules: {
