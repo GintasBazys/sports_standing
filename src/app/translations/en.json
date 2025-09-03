@@ -1,7 +1,7 @@
 {
   "headings": {
     "standings": "Standings",
-    "results": "Results"
+    "results": "Match Results"
   },
   "headers": {
     "name": { "team": "Team", "player": "Player" },
@@ -24,7 +24,7 @@
     "empty": "No results found"
   },
   "participants": {
-    "title": { "team": "Create Team", "player": "Create Player" },
+    "title": { "team": "Add Team", "player": "Add Player" },
     "placeholder": { "team": "Team name", "player": "Player name" },
     "addBtn": { "team": "Add Team", "player": "Add Player" },
     "errors": {

@@ -1,45 +1,69 @@
-import ParticipantsCreator from "@/features/participant-creator/ParticipantsCreator.tsx"
-import { TOURNAMENTS } from "@/app/constants/tournaments.ts"
-import ScoreCreator from "@/features/score-creator/ScoreCreator.tsx"
-import StandingsTable from "@/app/components/tables/StandingsTable.tsx"
-import MatchResultsTable from "@/app/components/tables/MatchResultsTable.tsx"
-import { getLayoutSettings } from "@/app/utils/layout.ts"
-import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
-import SecondaryButton from "@/app/components/buttons/SecondaryButton.tsx"
+import { useEffect, useMemo, useState } from "react"
+import { TOURNAMENTS } from "@/app/constants/tournaments"
+import TournamentCard from "@/app/components/tournaments/TournamentCard"
+import { Layout } from "@/app/enumerators/layout"
+import OutlineButton from "@/app/components/buttons/OutlineButton.tsx"
 
 export default function TournamentCards() {
+  const [activeLayout, setActiveLayout] = useState<Layout>(() => TOURNAMENTS[0]?.layout ?? Layout.CLEAN)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 1024px)")
+
+    const onChange = (event: MediaQueryListEvent) => {
+      setIsMobile(event.matches)
+      if (event.matches) {
+        setActiveLayout(Layout.CLEAN)
+      }
+    }
+
+    setIsMobile(mediaQuery.matches)
+    mediaQuery.addEventListener("change", onChange)
+
+    return () => {
+      mediaQuery.removeEventListener("change", onChange)
+    }
+  }, [])
+
+  const layoutButtons = useMemo(() => {
+    const seenLayouts: Layout[] = []
+    const buttons: { layout: Layout; label: string }[] = []
+
+    for (const tournament of TOURNAMENTS) {
+      if (!seenLayouts.includes(tournament.layout)) {
+        seenLayouts.push(tournament.layout)
+        buttons.push({ layout: tournament.layout, label: tournament.title })
+      }
+    }
+
+    return buttons
+  }, [])
+
+  const visibleTournaments = isMobile
+    ? TOURNAMENTS.filter(tournament => tournament.layout === activeLayout)
+    : TOURNAMENTS
+
   return (
     <>
-      {TOURNAMENTS.map(({ title, layout, tournament }) => {
-        const settings = getLayoutSettings(layout)
-        const commonProps = { tournament, settings }
+      {isMobile && (
+        <div className="button-wrapper">
+          {layoutButtons.map(({ layout, label }) => (
+            <OutlineButton
+              key={layout}
+              onClick={() => {
+                setActiveLayout(layout)
+              }}
+            >
+              {label}
+            </OutlineButton>
+          ))}
+        </div>
+      )}
 
-        return (
-          <section key={title} className={`layout-${layout} section`}>
-            <div className="card">
-              <div className="card__title">
-                <h2>{title}</h2>
-              </div>
-              {settings?.showButtons && (
-                <div className="card__actions">
-                  <PrimaryButton>Create Team</PrimaryButton>
-                  <SecondaryButton>Add Score</SecondaryButton>
-                </div>
-              )}
-              <div className="card__body">
-                {settings && (
-                  <>
-                    <ParticipantsCreator {...commonProps} />
-                    <ScoreCreator {...commonProps} />
-                    {settings.showMatchResults && <MatchResultsTable {...commonProps} />}
-                    {settings.showStandings && <StandingsTable {...commonProps} />}
-                  </>
-                )}
-              </div>
-            </div>
-          </section>
-        )
-      })}
+      {visibleTournaments.map(({ title, layout, id }) => (
+        <TournamentCard key={`${layout}-${id}`} title={title} layout={layout} tournamentId={id} />
+      ))}
     </>
   )
 }

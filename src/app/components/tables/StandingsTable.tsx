@@ -1,13 +1,13 @@
-import { useSelector } from "react-redux"
 import { selectStandings } from "@/features/participant-creator/participantsSlice.ts"
-import type { RootState } from "@/app/store"
 import type { TournamentProps } from "@/app/types/tournament.ts"
 import translations from "@/app/translations/en.json"
 import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
+import ReactCountryFlag from "react-country-flag"
+import { useAppSelector } from "@/app/stateHooks.ts"
 
-export default function StandingsTable({ tournament, settings }: TournamentProps) {
-  const standings = useSelector((state: RootState) => selectStandings(state, tournament))
+export default function StandingsTable({ tournamentId, settings }: TournamentProps) {
+  const standings = useAppSelector(state => selectStandings(state, tournamentId))
 
   const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
@@ -48,7 +48,17 @@ export default function StandingsTable({ tournament, settings }: TournamentProps
           <tbody>
             {standings.map(row => (
               <tr key={row.id} ref={setRowRef(row.id)}>
-                <td>{row.name}</td>
+                <td>
+                  <div className="wrapper">
+                    {settings?.showFlags && row.iso_code && (
+                      <ReactCountryFlag
+                        style={{ marginRight: "4px", position: "relative", top: "2px" }}
+                        countryCode={row.iso_code}
+                      />
+                    )}
+                    {row.name}
+                  </div>
+                </td>
                 {visibleCols.played && <td>{row.played}</td>}
                 {visibleCols.wins && <td>{row.wins}</td>}
                 {visibleCols.draws && <td>{row.draws}</td>}

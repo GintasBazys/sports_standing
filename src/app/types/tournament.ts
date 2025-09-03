@@ -1,4 +1,5 @@
 import type { Layout } from "@/app/enumerators/layout.ts"
+import type { ComponentProps } from "react"
 
 export type LayoutSettings = {
   name: Layout
@@ -18,8 +19,19 @@ export type LayoutSettings = {
 
 export type TournamentSettings = {
   title: string
-  tournament: string
+  id: string
   layout: Layout
 }
 
-export type TournamentProps = { tournament: string; settings: LayoutSettings | undefined }
+export type TournamentProps = {
+  tournamentId: string
+  settings: LayoutSettings | undefined
+}
+
+export type ButtonProps = ComponentProps<"button">
+
+export type TournamentItem = {
+  title: string
+  layout: Layout
+  tournamentId: string
+}

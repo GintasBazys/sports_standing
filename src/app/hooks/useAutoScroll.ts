@@ -1,12 +1,12 @@
 import { useCallback, useLayoutEffect, useRef } from "react"
 
 export function useAutoScroll(rows: { id: string }[]) {
-  const rowRefs = useRef<Map<string, HTMLTableRowElement>>(new Map())
+  const rowRefs = useRef<Map<string, HTMLElement>>(new Map())
   const prevIdsRef = useRef<Set<string>>(new Set())
   const initializedRef = useRef(false)
 
   const setRowRef = useCallback(
-    (id: string) => (el: HTMLTableRowElement | null) => {
+    (id: string) => (el: HTMLElement | null) => {
       if (el) {
         rowRefs.current.set(id, el)
       } else {

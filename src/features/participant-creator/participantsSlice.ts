@@ -1,5 +1,5 @@
-import { createSlice, nanoid, type PayloadAction, createSelector } from "@reduxjs/toolkit"
-import type { ParticipantState, Entry } from "@/app/types/participant.ts"
+import { createSelector, createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit"
+import type { ParticipantState, tournamentData } from "@/app/types/participant.ts"
 import type { RootState } from "@/app/store"
 
 const initialState: ParticipantState = {
@@ -11,13 +11,11 @@ export const participantsSlice = createSlice({
   initialState,
   reducers: create => ({
     addParticipant: create.preparedReducer(
-      (name: string, tournamentId: string) => {
-        const trimmed = name.trim()
-
-        return { payload: { id: nanoid(), name: trimmed, tournamentId } }
+      (name: string, tournamentId: string, iso_code?: string) => {
+        return { payload: { id: nanoid(), name, tournamentId, iso_code } }
       },
-      (state, action: PayloadAction<{ id: string; name: string; tournamentId: string }>) => {
-        const { id, name, tournamentId } = action.payload
+      (state, action: PayloadAction<{ id: string; name: string; tournamentId: string; iso_code?: string }>) => {
+        const { id, name, tournamentId, iso_code } = action.payload
         const tournamentData =
           state.byTournament[tournamentId] ?? (state.byTournament[tournamentId] = { teams: {}, teamOrder: [] })
 
@@ -31,7 +29,7 @@ export const participantsSlice = createSlice({
           return
         }
 
-        tournamentData.teams[id] = { id, name, wins: 0, draws: 0, losses: 0 }
+        tournamentData.teams[id] = { id, name, wins: 0, draws: 0, losses: 0, iso_code }
         tournamentData.teamOrder.push(id)
       }
     ),
@@ -88,8 +86,6 @@ export const participantsSlice = createSlice({
 const selectSelf = (state: RootState) => state.participant
 const selectByTournament = createSelector(selectSelf, s => s.byTournament)
 const selectTournamentArg = (_: RootState, tournamentId?: string) => tournamentId
-
-type tournamentData = { teams: Record<string, Entry>; teamOrder: string[] }
 
 const computeStandings = (data: tournamentData) => {
   const rows = data.teamOrder

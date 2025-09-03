@@ -7,30 +7,33 @@ import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import translations from "@/app/translations/en.json"
 import TextInput from "@/app/components/inputs/TextInput.tsx"
 import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
+import { MAX_NAME_LENGTH } from "@/app/constants/tournaments.ts"
 
-export default function ParticipantsCreator({ tournament, settings }: TournamentProps) {
+export default function ParticipantsCreator({ tournamentId, settings }: TournamentProps) {
   const dispatch = useDispatch()
   const standings = useSelector<RootState, ReturnType<typeof selectStandings>>(state =>
-    selectStandings(state, tournament)
+    selectStandings(state, tournamentId)
   )
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const isoRef = useRef<HTMLInputElement | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   const translationKey = settings?.showAddPlayer ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   function handleAddParticipant(e: FormEvent): void {
     e.preventDefault()
-    const el = inputRef.current
+    const nameEl = inputRef.current
+    const isoEl = isoRef.current
 
-    if (!el) {
+    if (!nameEl) {
       return
     }
 
-    const value = el.value
+    const value = nameEl.value
 
     if (!value) {
       setError(translations.participants.errors.empty[translationKey])
-      el.focus()
+      nameEl.focus()
 
       return
     }
@@ -39,27 +42,58 @@ export default function ParticipantsCreator({ tournament, settings }: Tournament
 
     if (exists) {
       setError(translations.participants.errors.duplicate[translationKey])
-      el.select()
-      el.focus()
+      nameEl.select()
+      nameEl.focus()
 
       return
     }
 
-    dispatch(addParticipant(el.value, tournament))
-    el.value = ""
+    let iso_code: string | undefined
+
+    if (settings?.showFlags && isoEl) {
+      const raw = isoEl.value
+
+      if (raw.length > 0 && !/^[A-Za-z]{2}$/.test(raw)) {
+        setError("Please enter a valid 2-letter ISO 3166-1 code (e.g., US, GB, LT).")
+        isoEl.focus()
+
+        return
+      }
+
+      iso_code = raw ? raw.toUpperCase() : undefined
+    }
+
+    dispatch(addParticipant(value, tournamentId, iso_code))
+    nameEl.value = ""
+    if (isoEl) {
+      isoEl.value = ""
+    }
+
     setError(null)
+    nameEl.focus()
   }
 
   return (
     <div className="card__element">
       <h2>{translations.participants.title[translationKey]}</h2>
       <form onSubmit={handleAddParticipant}>
-        <TextInput
-          id={`participant-${tournament}`}
-          ref={inputRef}
-          placeholder={translations.participants.placeholder[translationKey]}
-          maxLength={250}
-        />
+        <div className="input-wrapper">
+          <TextInput
+            id={`participant-${tournamentId}`}
+            ref={inputRef}
+            placeholder={translations.participants.placeholder[translationKey]}
+            maxLength={MAX_NAME_LENGTH}
+          />
+
+          {settings?.showFlags && (
+            <TextInput
+              id={`participant-iso-${tournamentId}`}
+              ref={isoRef}
+              placeholder="ISO country code (e.g., US)"
+              maxLength={2}
+            />
+          )}
+        </div>
         {error && <p style={{ color: "crimson", margin: "0.5rem 0 0 0" }}>{error}</p>}
         <PrimaryButton className="btn--full-width" type="submit">
           {translations.participants.addBtn[translationKey]}

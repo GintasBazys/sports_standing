@@ -6,76 +6,114 @@ import type { RootState } from "@/app/store"
 import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import type { TournamentProps } from "@/app/types/tournament.ts"
 import translations from "@/app/translations/en.json"
+import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
+import type { MatchEntry } from "@/app/types/scores.ts"
+import ReactCountryFlag from "react-country-flag"
 
-export default function MatchResultsTable({ tournament, settings }: TournamentProps) {
-  const matches = useSelector((state: RootState) => selectMatches(state, tournament))
-  const standings = useSelector((state: RootState) => selectStandings(state, tournament))
+export default function MatchResultsTable({ tournamentId, settings }: TournamentProps) {
+  const matches = useSelector<RootState, ReturnType<typeof selectMatches>>((state: RootState) =>
+    selectMatches(state, tournamentId)
+  )
 
-  const nameById = useMemo(() => {
-    const map = new Map<string, string>()
+  const standings = useSelector<RootState, ReturnType<typeof selectStandings>>((state: RootState) =>
+    selectStandings(state, tournamentId)
+  )
+
+  const nameAndFlagById = useMemo<Map<string, { name: string; isoCode: string | undefined }>>(() => {
+    const map = new Map<string, { name: string; isoCode: string | undefined }>()
 
     for (const team of standings) {
-      const id = team.id
-
-      if (!id) {
+      if (!team.id) {
         continue
       }
 
-      map.set(id, team.name)
+      map.set(team.id, { name: team.name, isoCode: team.iso_code })
     }
 
     return map
   }, [standings])
 
-  const definedMatches = useMemo(() => matches.filter((m): m is NonNullable<typeof m> => m != null), [matches])
+  const definedMatches = useMemo<MatchEntry[]>(
+    () => matches.filter((m): m is NonNullable<typeof m> => m != null),
+    [matches]
+  )
   const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
-  if (!tournament) {
-    return null
+  const setRowRef = useAutoScroll(definedMatches)
+
+  if (!tournamentId) {
+    return
   }
 
   return (
-    <div className="scrollable-x">
-      <table>
-        <thead>
-          <tr>
-            <th>{translations.headers.number}</th>
-            <th>{translations.headers.home[translationKey]}</th>
-            <th>{translations.headers.score}</th>
-            <th>{translations.headers.away[translationKey]}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {!definedMatches.length && (
+    <>
+      <h3>{translations.headings.results}</h3>
+      <div className="scrollable-x">
+        <table>
+          <thead>
             <tr>
-              <td style={{ textAlign: "center" }} colSpan={4}>
-                No results found
-              </td>
+              <th>{translations.headers.number}</th>
+              <th>{translations.headers.home[translationKey]}</th>
+              <th>{translations.headers.score}</th>
+              <th>{translations.headers.away[translationKey]}</th>
             </tr>
-          )}
-          {definedMatches.map((match, i) => {
-            const hasAnyScore = match.homeScore != null || match.awayScore != null
-
-            const homeName = match.homeId ? (nameById.get(match.homeId) ?? match.homeId) : "—"
-
-            const awayName = match.awayId ? (nameById.get(match.awayId) ?? match.awayId) : "—"
-
-            return (
-              <tr key={match.id}>
-                <td>{i + 1}</td>
-                <td>{homeName}</td>
-                <td>
-                  {match.homeScore ?? ""}
-                  {hasAnyScore ? " - " : ""}
-                  {match.awayScore ?? ""}
+          </thead>
+          <tbody>
+            {!definedMatches.length && (
+              <tr>
+                <td style={{ textAlign: "center" }} colSpan={4}>
+                  No results found
                 </td>
-                <td>{awayName}</td>
               </tr>
-            )
-          })}
-        </tbody>
-      </table>
-    </div>
+            )}
+            {definedMatches.map((match, i) => {
+              const hasAnyScore = match.homeScore != null || match.awayScore != null
+
+              const home = match.homeId
+                ? (nameAndFlagById.get(match.homeId) ?? { name: match.homeId, isoCode: "" })
+                : { name: "—", isoCode: undefined }
+
+              const away = match.awayId
+                ? (nameAndFlagById.get(match.awayId) ?? { name: match.awayId, isoCode: "" })
+                : { name: "—", isoCode: undefined }
+
+              return (
+                <tr key={match.id} ref={setRowRef(match.id)}>
+                  <td>{i + 1}</td>
+                  <td>
+                    <div className="wrapper">
+                      {settings?.showFlags && home.isoCode && (
+                        <ReactCountryFlag
+                          style={{ marginRight: "4px", position: "relative", top: "2px" }}
+                          countryCode={home.isoCode}
+                        />
+                      )}
+                      {home.name}
+                    </div>
+                  </td>
+                  <td>
+                    {match.homeScore}
+                    {hasAnyScore ? " - " : ""}
+                    {match.awayScore}
+                  </td>
+                  <td>
+                    <div className="wrapper">
+                      {settings?.showFlags && away.isoCode && (
+                        <ReactCountryFlag
+                          style={{ marginRight: "4px", position: "relative", top: "2px" }}
+                          countryCode={away.isoCode}
+                        />
+                      )}
+                      {away.name}
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   )
 }

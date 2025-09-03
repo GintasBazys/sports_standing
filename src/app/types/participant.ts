@@ -4,6 +4,7 @@ export type Entry = {
   wins: number
   draws: number
   losses: number
+  iso_code?: string
 }
 
 export type tournamentData = {
@@ -12,5 +13,5 @@ export type tournamentData = {
 }
 
 export type ParticipantState = {
-  byTournament: Partial<Record<string, tournamentData>>
+  byTournament: Record<string, tournamentData>
 }

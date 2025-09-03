@@ -13,5 +13,5 @@ export type MatchData = {
 }
 
 export type ScoresState = {
-  byTournament: Partial<Record<string, MatchData>>
+  byTournament: Record<string, MatchData>
 }
