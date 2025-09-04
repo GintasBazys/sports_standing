@@ -51,6 +51,7 @@ export default function TournamentCards() {
           {layoutButtons.map(({ layout, label }) => (
             <OutlineButton
               key={layout}
+              className={layout === activeLayout ? "outline-active" : ""}
               onClick={() => {
                 setActiveLayout(layout)
               }}

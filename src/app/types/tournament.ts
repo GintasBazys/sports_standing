@@ -9,7 +9,7 @@ export type LayoutSettings = {
   showMatchResults: boolean
   showButtons: boolean
   showFlags: boolean
-  showIcons: boolean
+  showWinLoseIcons: boolean
   showPlayed: boolean
   showWins: boolean
   showDraws: boolean

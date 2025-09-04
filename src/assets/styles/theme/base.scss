@@ -10,21 +10,26 @@ table {
 
   thead th {
     position: sticky;
+    z-index: 1;
     top: 0;
     background-color: var(--table-head-bg);
     color: var(--table-head-fg);
   }
 
-  tbody tr:nth-child(even) {
-    background-color: var(--table-row-even-bg);
-  }
+  tbody {
+    tr {
+      &:nth-child(even) {
+        background-color: var(--table-row-even-bg);
+      }
 
-  tbody tr:nth-child(odd) {
-    background-color: var(--table-row-odd-bg);
-  }
+      &:nth-child(odd) {
+        background-color: var(--table-row-odd-bg);
+      }
 
-  tbody tr:hover {
-    background-color: var(--table-row-hover-bg);
+      &:hover {
+        background-color: var(--table-row-hover-bg);
+      }
+    }
   }
 
   th,
@@ -85,7 +90,6 @@ h1 {
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
-  line-height: 1.25;
   font: inherit;
 
   &::placeholder {
@@ -125,7 +129,6 @@ h1 {
   gap: 0.5rem;
   padding: var(--btn-padding-y) var(--btn-padding-x);
   border-radius: var(--btn-radius);
-  line-height: 1.25;
   font: inherit;
   text-decoration: none;
   cursor: pointer;
@@ -177,7 +180,6 @@ h1 {
     padding: 0.6rem 1.2rem;
     border-radius: 0.5rem;
     font-size: 1rem;
-    cursor: pointer;
     transition: background-color 0.25s ease, color 0.25s ease;
 
     &:hover {
@@ -206,14 +208,20 @@ select {
   color: var(--input-fg);
   border: 1px solid var(--input-border);
   border-radius: 0.5rem;
-  line-height: 1.25;
   font: inherit;
   padding: 0.5rem 2.25rem 0.5rem 0.75rem;
-  background-repeat: no-repeat;
-  background-position: right 0.6rem center;
-  background-size: 1rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3E%3C/svg%3E");
   margin: 0.5rem 0;
+
+  + .arrow {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    width: 1em;
+    height: 1em;
+    pointer-events: none;
+    transform: translateY(-50%);
+    color: var(--arrow-color);
+  }
 
   &:focus {
     outline: none;
@@ -224,6 +232,10 @@ select {
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+
+    + .arrow {
+      opacity: 0.6;
+    }
   }
 }
 
@@ -258,4 +270,40 @@ select {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.5rem;
+}
+
+.error {
+  color: red;
+  margin: 0.5rem 0 0 0;
+}
+
+.select-wrapper {
+  position: relative;
+}
+
+.country-flag {
+  margin-right: 0.25rem;
+  position: relative;
+  top: 0.125rem;
+  @include media-max(lg) {
+    top: 0;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.margin-0 {
+  margin: 0;
+}
+
+.icon {
+  position: relative;
+  top: 0.125rem;
+
+}
+
+.outline-active {
+  border-color: #2e7d32;
 }

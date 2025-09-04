@@ -7,7 +7,7 @@ import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import translations from "@/app/translations/en.json"
 import TextInput from "@/app/components/inputs/TextInput.tsx"
 import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
-import { MAX_NAME_LENGTH } from "@/app/constants/tournaments.ts"
+import { MAX_ENTRY_LIMIT, MAX_NAME_LENGTH } from "@/app/constants/tournaments.ts"
 
 export default function ParticipantsCreator({ tournamentId, settings }: TournamentProps) {
   const dispatch = useDispatch()
@@ -33,7 +33,6 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
 
     if (!value) {
       setError(translations.participants.errors.empty[translationKey])
-      nameEl.focus()
 
       return
     }
@@ -42,8 +41,6 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
 
     if (exists) {
       setError(translations.participants.errors.duplicate[translationKey])
-      nameEl.select()
-      nameEl.focus()
 
       return
     }
@@ -55,7 +52,6 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
 
       if (raw.length > 0 && !/^[A-Za-z]{2}$/.test(raw)) {
         setError("Please enter a valid 2-letter ISO 3166-1 code (e.g., US, GB, LT).")
-        isoEl.focus()
 
         return
       }
@@ -70,8 +66,9 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
     }
 
     setError(null)
-    nameEl.focus()
   }
+
+  const maxEntries = standings.length >= MAX_ENTRY_LIMIT
 
   return (
     <div className="card__element">
@@ -94,10 +91,11 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
             />
           )}
         </div>
-        {error && <p style={{ color: "crimson", margin: "0.5rem 0 0 0" }}>{error}</p>}
-        <PrimaryButton className="btn--full-width" type="submit">
+        {error && <p className="error">{error}</p>}
+        <PrimaryButton className="btn--full-width" type="submit" disabled={maxEntries}>
           {translations.participants.addBtn[translationKey]}
         </PrimaryButton>
+        {maxEntries && <p className="error margin-0">Max entry limit reached - {MAX_ENTRY_LIMIT}</p>}
       </form>
     </div>
   )

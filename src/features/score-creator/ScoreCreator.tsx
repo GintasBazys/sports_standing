@@ -1,131 +1,119 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type RefObject } from "react"
-import { useSelector } from "react-redux"
-import {
-  createMatch,
-  addHomeScore,
-  addAwayScore,
-  selectHasPlayed,
-  selectOpponentsPlayed
-} from "@/features/score-creator/scoresSlice.ts"
+import { useMemo, useRef, useState, type FormEvent, type RefObject, type ChangeEvent, type ReactElement } from "react"
+import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice.ts"
 import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
-import type { RootState } from "@/app/store"
 import NumberInput from "@/app/components/inputs/NumberInput.tsx"
 import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
 import { useAppDispatch, useAppSelector } from "@/app/stateHooks.ts"
 import type { TournamentProps } from "@/app/types/tournament.ts"
-import { MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments.ts"
+import type { RootState } from "@/app/store"
+import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments.ts"
 
 export default function ScoreCreator({ tournamentId, settings }: TournamentProps) {
-  const showPlayer = settings?.showAddPlayer === true
+  const isPlayerMode = settings?.showAddPlayer === true
 
   const dispatch = useAppDispatch()
-  const teams = useAppSelector(state => selectStandings(state, tournamentId))
 
-  const [homeId, setHomeId] = useState("")
-  const [awayId, setAwayId] = useState("")
-  const [error, setError] = useState<string | null>(null)
+  function selectParticipantsForTournament(state: RootState) {
+    return selectStandings(state, tournamentId)
+  }
+
+  const participants = useAppSelector(selectParticipantsForTournament)
+
+  const [homeParticipantId, setHomeParticipantId] = useState("")
+  const [awayParticipantId, setAwayParticipantId] = useState("")
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const homeScoreRef = useRef<HTMLInputElement | null>(null)
   const awayScoreRef = useRef<HTMLInputElement | null>(null)
 
-  const [homeWon, setHomeWon] = useState(false)
-  const [awayWon, setAwayWon] = useState(false)
+  const [homeParticipantWon, setHomeParticipantWon] = useState(false)
+  const [awayParticipantWon, setAwayParticipantWon] = useState(false)
 
-  const options = useMemo<{ id: string; name: string }[]>(() => teams.map(t => ({ id: t.id, name: t.name })), [teams])
-  const readyForScores = !!homeId && !!awayId && homeId !== awayId
+  const participantOptions = useMemo<{ id: string; name: string }[]>(() => {
+    const options = []
 
-  const alreadyPlayed = useSelector<RootState, boolean>(state => selectHasPlayed(state, tournamentId, homeId, awayId))
+    for (const participant of participants) {
+      if (participant.played + 1 === participants.length) {
+        continue
+      }
 
-  const opponentsPlayedByHome = useSelector<RootState, Set<string>>(state =>
-    selectOpponentsPlayed(state, tournamentId, homeId)
-  )
+      options.push({ id: participant.id, name: participant.name })
+    }
 
-  const unavailableAwayIds = useMemo<Set<string>>(() => {
-    if (!homeId) {
+    return options
+  }, [participants])
+
+  const canEnterScores = homeParticipantId !== "" && awayParticipantId !== "" && homeParticipantId !== awayParticipantId
+
+  function selectOpponentsForHome(state: RootState): Set<string> {
+    return selectOpponentsPlayed(state, tournamentId, homeParticipantId)
+  }
+
+  const opponentsPlayedByHome = useAppSelector(selectOpponentsForHome)
+
+  const unavailableAwayIds = useMemo(() => {
+    if (!homeParticipantId) {
       return new Set<string>()
     }
 
-    const opponents = new Set<string>(opponentsPlayedByHome)
+    const ids = new Set<string>(opponentsPlayedByHome)
 
-    opponents.add(homeId)
+    ids.add(homeParticipantId)
 
-    return opponents
-  }, [homeId, opponentsPlayedByHome])
+    return ids
+  }, [homeParticipantId, opponentsPlayedByHome])
 
-  const awayOptions = useMemo(() => {
-    if (!homeId) {
+  const filteredAwayOptions = useMemo(() => {
+    if (!homeParticipantId) {
       return []
     }
 
-    return options.filter(o => !unavailableAwayIds.has(o.id))
-  }, [homeId, options, unavailableAwayIds])
+    return participantOptions.filter(option => !unavailableAwayIds.has(option.id))
+  }, [homeParticipantId, participantOptions, unavailableAwayIds])
 
-  useEffect(() => {
-    if (awayId && unavailableAwayIds.has(awayId)) {
-      setAwayId("")
-    }
-  }, [awayId, unavailableAwayIds])
+  function clampScoreFromRef(inputRef: RefObject<HTMLInputElement | null>, maxScore = MAX_SCORE): number {
+    const rawValue = Number(inputRef.current?.value)
+    const truncated = Math.trunc(rawValue)
 
-  useEffect(() => {
-    setHomeWon(false)
-    setAwayWon(false)
-  }, [homeId, awayId])
-
-  function readClampedScore(ref: RefObject<HTMLInputElement | null>, max = MAX_SCORE): number {
-    const raw = Number(ref.current?.value)
-    const number = Math.trunc(raw)
-
-    if (Number.isNaN(number)) {
-      return 0
-    }
-
-    return Math.max(0, Math.min(max, number))
+    return Math.max(0, Math.min(maxScore, truncated))
   }
 
-  function onSubmit(e: FormEvent): void {
-    e.preventDefault()
+  function handleSubmit(event: FormEvent): void {
+    event.preventDefault()
 
-    if (!readyForScores) {
-      setError("Pick two different teams")
-
-      return
-    }
-
-    if (alreadyPlayed) {
-      setError("These teams have already played each other")
+    if (!canEnterScores) {
+      setErrorMessage("Pick two different teams")
 
       return
     }
 
-    const home = readClampedScore(homeScoreRef, MAX_SCORE)
-    const away = readClampedScore(awayScoreRef, MAX_SCORE)
+    const homeScore = clampScoreFromRef(homeScoreRef, MAX_SCORE)
+    const awayScore = clampScoreFromRef(awayScoreRef, MAX_SCORE)
 
-    let standingsH = home
-    let standingsA = away
+    let standingsHome = homeScore
+    let standingsAway = awayScore
 
-    if (showPlayer) {
-      if (homeWon === awayWon) {
-        setError("Select exactly one winner")
+    if (isPlayerMode) {
+      if (homeParticipantWon === awayParticipantWon) {
+        setErrorMessage("Select exactly one winner")
 
         return
       }
 
-      standingsH = homeWon ? 1 : 0
-      standingsA = awayWon ? 1 : 0
+      standingsHome = homeParticipantWon ? 1 : 0
+      standingsAway = awayParticipantWon ? 1 : 0
     }
 
-    const create = createMatch(tournamentId, homeId, awayId)
+    const createAction = createMatch(tournamentId, homeParticipantId, awayParticipantId)
 
-    dispatch(create)
-    const matchId = create.payload.id
+    dispatch(createAction)
+    const matchId = createAction.payload.id
 
-    dispatch(addHomeScore(tournamentId, matchId, home))
-    dispatch(addAwayScore(tournamentId, matchId, away))
+    dispatch(setMatchScores(tournamentId, matchId, homeScore, awayScore))
+    dispatch(recordResult(tournamentId, homeParticipantId, awayParticipantId, standingsHome, standingsAway))
 
-    dispatch(recordResult(tournamentId, homeId, awayId, standingsH, standingsA))
-
-    setHomeId("")
-    setAwayId("")
+    setHomeParticipantId("")
+    setAwayParticipantId("")
     if (homeScoreRef.current) {
       homeScoreRef.current.value = "0"
     }
@@ -134,102 +122,133 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
       awayScoreRef.current.value = "0"
     }
 
-    setHomeWon(false)
-    setAwayWon(false)
-    setError(null)
+    setHomeParticipantWon(false)
+    setAwayParticipantWon(false)
+    setErrorMessage(null)
   }
 
-  const homeName = options.find(option => option.id === homeId)?.name ?? "Home"
-  const awayName = options.find(option => option.id === awayId)?.name ?? "Away"
+  function handleHomeSelectChange(event: ChangeEvent<HTMLSelectElement>): void {
+    setHomeParticipantId(event.target.value)
+    setErrorMessage(null)
+  }
+
+  function handleAwaySelectChange(event: ChangeEvent<HTMLSelectElement>): void {
+    setAwayParticipantId(event.target.value)
+    setErrorMessage(null)
+  }
+
+  function handleHomeWonChange(event: ChangeEvent<HTMLInputElement>): void {
+    const isChecked = event.target.checked
+
+    setHomeParticipantWon(isChecked)
+    if (isChecked) {
+      setAwayParticipantWon(false)
+    }
+
+    setErrorMessage(null)
+  }
+
+  function handleAwayWonChange(event: ChangeEvent<HTMLInputElement>): void {
+    const isChecked = event.target.checked
+
+    setAwayParticipantWon(isChecked)
+    if (isChecked) {
+      setHomeParticipantWon(false)
+    }
+
+    setErrorMessage(null)
+  }
+
+  function getParticipantNameById(options: { id: string; name: string }[], id: string, fallback: string): string {
+    for (const option of options) {
+      if (option.id === id) {
+        return option.name
+      }
+    }
+
+    return fallback
+  }
+
+  function renderParticipantOption(option: { id: string; name: string }): ReactElement {
+    return (
+      <option key={option.id} value={option.id}>
+        {option.name}
+      </option>
+    )
+  }
+
+  const homeParticipantName = getParticipantNameById(participantOptions, homeParticipantId, "Home")
+  const awayParticipantName = getParticipantNameById(participantOptions, awayParticipantId, "Away")
+  const maxEntries = participants.length >= MAX_ENTRY_LIMIT
 
   return (
     <div className="card__element">
       <h2>Add Result</h2>
-      <form onSubmit={onSubmit}>
-        <div>
-          <label htmlFor={`homeOptions-${tournamentId}`}>Home</label>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor={`homeOptions-${tournamentId}`}>Home</label>
+        <div className="select-wrapper">
           <select
             id={`homeOptions-${tournamentId}`}
-            value={homeId}
-            onChange={e => {
-              setHomeId(e.target.value)
-              setError(null)
-            }}
-            disabled={options.length === 0}
+            value={homeParticipantId}
+            onChange={handleHomeSelectChange}
+            disabled={participantOptions.length === 0}
           >
             <option value="" disabled>
               Select team
             </option>
-            {options.map(o => (
-              <option key={o.id} value={o.id}>
-                {o.name}
-              </option>
-            ))}
+            {participantOptions.map(renderParticipantOption)}
           </select>
-
-          <label htmlFor={`awayOptions-${tournamentId}`}>Away</label>
+          <svg className="arrow" viewBox="0 0 16 16">
+            <path
+              d="M2 5l6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <label htmlFor={`awayOptions-${tournamentId}`}>Away</label>
+        <div className="select-wrapper">
           <select
-            value={awayId}
             id={`awayOptions-${tournamentId}`}
-            onChange={e => {
-              setAwayId(e.target.value)
-              setError(null)
-            }}
-            disabled={!homeId}
+            value={awayParticipantId}
+            onChange={handleAwaySelectChange}
+            disabled={!homeParticipantId}
           >
             <option value="" disabled>
               Select team
             </option>
-            {homeId &&
-              awayOptions.map(o => (
-                <option key={o.id} value={o.id}>
-                  {o.name}
-                </option>
-              ))}
-            {homeId && awayOptions.length === 0 && (
+            {filteredAwayOptions.map(renderParticipantOption)}
+            {filteredAwayOptions.length === 0 && (
               <option value="" disabled>
                 No opponents available
               </option>
             )}
           </select>
+          <svg className="arrow" viewBox="0 0 16 16">
+            <path
+              d="M2 5l6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
         </div>
-        {readyForScores && (
+        {canEnterScores && (
           <>
-            {showPlayer ? (
+            {isPlayerMode ? (
               <div className="row">
-                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input
-                    type="checkbox"
-                    checked={homeWon}
-                    onChange={e => {
-                      const checked = e.target.checked
-
-                      setHomeWon(checked)
-                      if (checked) {
-                        setAwayWon(false)
-                      }
-
-                      setError(null)
-                    }}
-                  />
-                  <span>{homeName} won</span>
+                <label>
+                  <input type="checkbox" checked={homeParticipantWon} onChange={handleHomeWonChange} />
+                  <span>{homeParticipantName} won</span>
                 </label>
-                <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <input
-                    type="checkbox"
-                    checked={awayWon}
-                    onChange={e => {
-                      const checked = e.target.checked
-
-                      setAwayWon(checked)
-                      if (checked) {
-                        setHomeWon(false)
-                      }
-
-                      setError(null)
-                    }}
-                  />
-                  <span>{awayName} won</span>
+                <label>
+                  <input type="checkbox" checked={awayParticipantWon} onChange={handleAwayWonChange} />
+                  <span>{awayParticipantName} won</span>
                 </label>
               </div>
             ) : (
@@ -253,19 +272,12 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
                 />
               </div>
             )}
-            <PrimaryButton
-              className="btn--full-width"
-              type="submit"
-              disabled={alreadyPlayed || (showPlayer && homeWon === awayWon)}
-            >
+            {errorMessage && <p className="error">{errorMessage}</p>}
+            <PrimaryButton className="btn--full-width" type="submit" disabled={maxEntries}>
               Save Result
             </PrimaryButton>
+            {maxEntries && <p className="error margin-0">Max entry limit reached - {MAX_ENTRY_LIMIT}</p>}
           </>
-        )}
-        {error && (
-          <p role="alert" style={{ color: "crimson", marginTop: "8px" }}>
-            {error}
-          </p>
         )}
       </form>
     </div>

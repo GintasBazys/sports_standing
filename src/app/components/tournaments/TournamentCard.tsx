@@ -28,14 +28,14 @@ export default function TournamentCard({ title, layout, tournamentId }: Tourname
           <div className="card__actions">
             <PrimaryButton
               onClick={() => {
-                setShowParticipantCreator(v => !v)
+                setShowParticipantCreator(value => !value)
               }}
             >
               {showParticipantCreator ? "Hide Team Creator" : "Add Team"}
             </PrimaryButton>
             <SecondaryButton
               onClick={() => {
-                setShowScoreCreator(v => !v)
+                setShowScoreCreator(value => !value)
               }}
             >
               {showScoreCreator ? "Hide Score Creator" : "Add Score"}

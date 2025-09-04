@@ -1,3 +1,5 @@
+@use "@/assets/styles/mixins" as *;
+
 .card {
   text-align: center;
   border-radius: var(--card-radius, 10px);

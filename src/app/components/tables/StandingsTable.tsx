@@ -5,6 +5,8 @@ import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
 import ReactCountryFlag from "react-country-flag"
 import { useAppSelector } from "@/app/stateHooks.ts"
+import winIcon from "@/assets/icons/win.svg"
+import loseIcon from "@/assets/icons/lose.svg"
 
 export default function StandingsTable({ tournamentId, settings }: TournamentProps) {
   const standings = useAppSelector(state => selectStandings(state, tournamentId))
@@ -51,25 +53,36 @@ export default function StandingsTable({ tournamentId, settings }: TournamentPro
                 <td>
                   <div className="wrapper">
                     {settings?.showFlags && row.iso_code && (
-                      <ReactCountryFlag
-                        style={{ marginRight: "4px", position: "relative", top: "2px" }}
-                        countryCode={row.iso_code}
-                      />
+                      <ReactCountryFlag className="country-flag" countryCode={row.iso_code} />
                     )}
                     {row.name}
                   </div>
                 </td>
                 {visibleCols.played && <td>{row.played}</td>}
-                {visibleCols.wins && <td>{row.wins}</td>}
+                {visibleCols.wins && (
+                  <td>
+                    {row.wins}
+                    {settings?.showWinLoseIcons && row.wins > 0 && (
+                      <img className="icon" width={16} height={16} src={winIcon} alt="win" />
+                    )}
+                  </td>
+                )}
                 {visibleCols.draws && <td>{row.draws}</td>}
-                {visibleCols.losses && <td>{row.losses}</td>}
+                {visibleCols.losses && (
+                  <td>
+                    {row.losses}
+                    {settings?.showWinLoseIcons && row.losses > 0 && (
+                      <img className="icon" width={16} height={16} src={loseIcon} alt="lose" />
+                    )}
+                  </td>
+                )}
                 {visibleCols.points && <td>{row.points}</td>}
               </tr>
             ))}
 
             {standings.length === 0 && (
               <tr>
-                <td style={{ textAlign: "center" }} colSpan={colCount}>
+                <td className="text-center" colSpan={colCount}>
                   {translations.empty[translationKey]}
                 </td>
               </tr>

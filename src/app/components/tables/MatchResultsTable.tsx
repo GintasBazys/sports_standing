@@ -20,23 +20,21 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
   )
 
   const nameAndFlagById = useMemo<Map<string, { name: string; isoCode: string | undefined }>>(() => {
-    const map = new Map<string, { name: string; isoCode: string | undefined }>()
+    const participantsById = new Map<string, { name: string; isoCode: string | undefined }>()
 
-    for (const team of standings) {
-      if (!team.id) {
+    for (const participant of standings) {
+      if (!participant.id) {
         continue
       }
 
-      map.set(team.id, { name: team.name, isoCode: team.iso_code })
+      participantsById.set(participant.id, { name: participant.name, isoCode: participant.iso_code })
     }
 
-    return map
+    return participantsById
   }, [standings])
 
-  const definedMatches = useMemo<MatchEntry[]>(
-    () => matches.filter((m): m is NonNullable<typeof m> => m != null),
-    [matches]
-  )
+  const definedMatches = useMemo<MatchEntry[]>(() => matches.filter(matchEntry => matchEntry != null), [matches])
+
   const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
@@ -62,12 +60,12 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
           <tbody>
             {!definedMatches.length && (
               <tr>
-                <td style={{ textAlign: "center" }} colSpan={4}>
+                <td className="text-center" colSpan={4}>
                   No results found
                 </td>
               </tr>
             )}
-            {definedMatches.map((match, i) => {
+            {definedMatches.map((match, index) => {
               const hasAnyScore = match.homeScore != null || match.awayScore != null
 
               const home = match.homeId
@@ -80,14 +78,11 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
 
               return (
                 <tr key={match.id} ref={setRowRef(match.id)}>
-                  <td>{i + 1}</td>
+                  <td>{index + 1}</td>
                   <td>
                     <div className="wrapper">
                       {settings?.showFlags && home.isoCode && (
-                        <ReactCountryFlag
-                          style={{ marginRight: "4px", position: "relative", top: "2px" }}
-                          countryCode={home.isoCode}
-                        />
+                        <ReactCountryFlag className="country-flag" countryCode={home.isoCode} />
                       )}
                       {home.name}
                     </div>
@@ -100,10 +95,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
                   <td>
                     <div className="wrapper">
                       {settings?.showFlags && away.isoCode && (
-                        <ReactCountryFlag
-                          style={{ marginRight: "4px", position: "relative", top: "2px" }}
-                          countryCode={away.isoCode}
-                        />
+                        <ReactCountryFlag className="country-flag" countryCode={away.isoCode} />
                       )}
                       {away.name}
                     </div>

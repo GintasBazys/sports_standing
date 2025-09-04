@@ -15,7 +15,7 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
     showMatchResults: false,
     showButtons: false,
     showFlags: false,
-    showIcons: false,
+    showWinLoseIcons: false,
     showPlayed: true,
     showWins: true,
     showDraws: true,
@@ -30,7 +30,7 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
     showMatchResults: true,
     showButtons: true,
     showFlags: true,
-    showIcons: false,
+    showWinLoseIcons: false,
     showPlayed: true,
     showWins: true,
     showDraws: true,
@@ -45,7 +45,7 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
     showMatchResults: false,
     showButtons: true,
     showFlags: false,
-    showIcons: true,
+    showWinLoseIcons: true,
     showPlayed: true,
     showWins: true,
     showDraws: false,
@@ -57,3 +57,4 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
 export const MAX_SCORE = 99
 export const MIN_SCORE = 0
 export const MAX_NAME_LENGTH = 250
+export const MAX_ENTRY_LIMIT = 100

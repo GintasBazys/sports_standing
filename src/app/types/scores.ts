@@ -3,8 +3,8 @@ export type MatchEntry = {
   tournamentId: string
   homeId: string
   awayId: string
-  homeScore: number | null
-  awayScore: number | null
+  homeScore?: number
+  awayScore?: number
 }
 
 export type MatchData = {
