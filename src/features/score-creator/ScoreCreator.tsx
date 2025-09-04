@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState, type FormEvent, type RefObject, type ChangeEvent, type ReactElement } from "react"
-import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice"
-import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice"
-import NumberInput from "@/app/components/inputs/NumberInput"
-import PrimaryButton from "@/app/components/buttons/PrimaryButton"
-import { useAppDispatch, useAppSelector } from "@/app/stateHooks"
-import type { TournamentProps } from "@/app/types/tournament"
-import type { RootState } from "@/app/store"
-import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments"
+import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice.ts"
+import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
+import NumberInput from "@/app/components/inputs/NumberInput.tsx"
+import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
+import { useAppDispatch, useAppSelector } from "@/app/stateHooks.ts"
+import type { TournamentProps } from "@/app/types/tournament.ts"
+import type { RootState } from "@/app/store.ts"
+import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments.ts"
+import { ParticipantTypes } from "@/app/enumerators/participant.ts"
+import translations from "@/app/translations/en.json"
 
 export default function ScoreCreator({ tournamentId, settings }: TournamentProps) {
   const isPlayerMode = settings?.showAddPlayer === true
@@ -82,7 +84,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
     event.preventDefault()
 
     if (!canEnterScores) {
-      setErrorMessage("Pick two different teams")
+      setErrorMessage(translations.scores.errors.pickDifferent[translationKey])
 
       return
     }
@@ -95,7 +97,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
 
     if (isPlayerMode) {
       if (homeParticipantWon === awayParticipantWon) {
-        setErrorMessage("Select exactly one winner")
+        setErrorMessage(translations.scores.errors.winnerRequired)
 
         return
       }
@@ -181,11 +183,14 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
   const awayParticipantName = getParticipantNameById(participantOptions, awayParticipantId, "Away")
   const maxEntries = participants.length >= MAX_ENTRY_LIMIT
 
+  const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
+  const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
+
   return (
     <div className="card__element">
-      <h2>Add Result</h2>
+      <h2>{translations.scores.addTitle}</h2>
       <form onSubmit={handleSubmit}>
-        <label htmlFor={`homeOptions-${tournamentId}`}>Home</label>
+        <label htmlFor={`homeOptions-${tournamentId}`}>{translations.scores.labels.home[translationKey]}</label>
         <div className="select-wrapper">
           <select
             id={`homeOptions-${tournamentId}`}
@@ -194,7 +199,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             disabled={participantOptions.length === 0}
           >
             <option value="" disabled>
-              Select team
+              {translations.scores.selectPlaceholder[translationKey]}
             </option>
             {participantOptions.map(renderParticipantOption)}
           </select>
@@ -209,7 +214,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             />
           </svg>
         </div>
-        <label htmlFor={`awayOptions-${tournamentId}`}>Away</label>
+        <label htmlFor={`awayOptions-${tournamentId}`}>{translations.scores.labels.away[translationKey]}</label>
         <div className="select-wrapper">
           <select
             id={`awayOptions-${tournamentId}`}
@@ -218,12 +223,12 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             disabled={!homeParticipantId}
           >
             <option value="" disabled>
-              Select team
+              {translations.scores.selectPlaceholder[translationKey]}
             </option>
             {filteredAwayOptions.map(renderParticipantOption)}
             {filteredAwayOptions.length === 0 && (
               <option value="" disabled>
-                No opponents available
+                {translations.scores.noOpponents}
               </option>
             )}
           </select>

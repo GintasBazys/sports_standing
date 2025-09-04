@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react"
-import { TOURNAMENTS } from "@/app/constants/tournaments"
-import TournamentCard from "@/app/components/tournaments/TournamentCard"
-import { Layout } from "@/app/enumerators/layout"
-import OutlineButton from "@/app/components/buttons/OutlineButton"
+import { TOURNAMENTS } from "@/app/constants/tournaments.ts"
+import TournamentCard from "@/app/components/tournaments/TournamentCard.tsx"
+import { Layout } from "@/app/enumerators/layout.ts"
+import OutlineButton from "@/app/components/buttons/OutlineButton.tsx"
 
 export default function TournamentCards() {
   const [activeLayout, setActiveLayout] = useState<Layout>(() => TOURNAMENTS[0]?.layout ?? Layout.CLEAN)

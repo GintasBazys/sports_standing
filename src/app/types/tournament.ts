@@ -29,6 +29,8 @@ export type TournamentProps = {
 }
 
 export type ButtonProps = ComponentProps<"button">
+export type TextInputProps = Omit<ComponentProps<"input">, "type">
+export type NumberInputProps = Omit<ComponentProps<"input">, "type">
 
 export type TournamentItem = {
   title: string

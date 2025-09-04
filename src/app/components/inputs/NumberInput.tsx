@@ -1,6 +1,4 @@
-import type { ComponentProps } from "react"
-
-export type NumberInputProps = Omit<ComponentProps<"input">, "type">
+import type { NumberInputProps } from "@/app/types/tournament.ts"
 
 export default function NumberInput({
   ref,

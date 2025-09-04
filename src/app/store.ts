@@ -1,8 +1,8 @@
 import { configureStore, combineSlices } from "@reduxjs/toolkit"
-import { participantsSlice } from "@/features/participant-creator/participantsSlice"
+import { participantsSlice } from "@/features/participant-creator/participantsSlice.ts"
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-import { scoresSlice } from "@/features/score-creator/scoresSlice"
+import { scoresSlice } from "@/features/score-creator/scoresSlice.ts"
 
 const rootReducer = combineSlices(participantsSlice, scoresSlice)
 

@@ -4,16 +4,27 @@
     "results": "Match Results"
   },
   "headers": {
-    "name": { "team": "Team", "player": "Player" },
-    "played": { "team": "P", "player": "M" },
+    "name": {
+      "team": "Team",
+      "player": "Player"
+    },
+    "played": {
+      "team": "P",
+      "player": "M"
+    },
     "wins": "W",
     "draws": "D",
     "losses": "L",
     "points": "Pts",
-
     "number": "#",
-    "home": { "team": "Home", "player": "Player1" },
-    "away": { "team": "Away", "player": "Player2" },
+    "home": {
+      "team": "Home",
+      "player": "Player1"
+    },
+    "away": {
+      "team": "Away",
+      "player": "Player2"
+    },
     "score": "Score"
   },
   "empty": {
@@ -24,15 +35,60 @@
     "empty": "No results found"
   },
   "participants": {
-    "title": { "team": "Add Team", "player": "Add Player" },
-    "placeholder": { "team": "Team name", "player": "Player name" },
-    "addBtn": { "team": "Add Team", "player": "Add Player" },
+    "title": {
+      "team": "Add Team",
+      "player": "Add Player"
+    },
+    "placeholder": {
+      "team": "Team name",
+      "player": "Player name"
+    },
+    "addBtn": {
+      "team": "Add Team",
+      "player": "Add Player"
+    },
+    "hideBtn": {
+      "team": "Hide Team Creator",
+      "player": "Hide Player Creator"
+    },
     "errors": {
-      "empty": { "team": "Please enter a team name", "player": "Please enter a player name" },
+      "empty": {
+        "team": "Please enter a team name",
+        "player": "Please enter a player name"
+      },
       "duplicate": {
         "team": "That team name already exists",
         "player": "That player name already exists"
       }
+    }
+  },
+  "scores": {
+    "addTitle": "Add Result",
+    "labels": {
+      "home": {
+        "team": "Home",
+        "player": "Player1"
+      },
+      "away": {
+        "team": "Away",
+        "player": "Player2"
+      }
+    },
+    "selectPlaceholder": {
+      "team": "Select team",
+      "player": "Select player"
+    },
+    "noOpponents": "No opponents available",
+    "winner": "Winner",
+    "saveBtn": "Save Result",
+    "addBtn": "Add Score",
+    "hideBtn": "Hide Score Creator",
+    "errors": {
+      "pickDifferent": {
+        "team": "Pick two different teams",
+        "player": "Pick two different players"
+      },
+      "winnerRequired": "Select exactly one winner"
     }
   }
 }

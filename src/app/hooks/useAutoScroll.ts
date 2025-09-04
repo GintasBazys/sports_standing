@@ -3,7 +3,7 @@ import { useCallback, useLayoutEffect, useRef } from "react"
 export function useAutoScroll(rows: { id: string }[]) {
   const rowRefs = useRef<Map<string, HTMLElement>>(new Map())
   const prevIdsRef = useRef<Set<string>>(new Set())
-  const initializedRef = useRef(false)
+  const initializedRef = useRef<boolean>(false)
 
   const setRowRef = useCallback(
     (id: string) => (el: HTMLElement | null) => {

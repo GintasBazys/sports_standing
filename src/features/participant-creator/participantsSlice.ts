@@ -1,6 +1,6 @@
 import { createSelector, createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit"
-import type { ParticipantState, tournamentData } from "@/app/types/participant"
-import type { RootState } from "@/app/store"
+import type { ParticipantState, tournamentData } from "@/app/types/participant.ts"
+import type { RootState } from "@/app/store.ts"
 
 const initialState: ParticipantState = {
   byTournament: {}

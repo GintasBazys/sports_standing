@@ -7,6 +7,8 @@ import ParticipantsCreator from "@/features/participant-creator/ParticipantsCrea
 import ScoreCreator from "@/features/score-creator/ScoreCreator"
 import MatchResultsTable from "@/app/components/tables/MatchResultsTable"
 import StandingsTable from "@/app/components/tables/StandingsTable"
+import { ParticipantTypes } from "@/app/enumerators/participant"
+import translations from "@/app/translations/en.json"
 
 export default function TournamentCard({ title, layout, tournamentId }: TournamentItem) {
   const settings = getLayoutSettings(layout)
@@ -14,6 +16,9 @@ export default function TournamentCard({ title, layout, tournamentId }: Tourname
 
   const [showParticipantCreator, setShowParticipantCreator] = useState<boolean>(!settings?.showButtons)
   const [showScoreCreator, setShowScoreCreator] = useState<boolean>(!settings?.showButtons)
+
+  const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
+  const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   const shouldShowCreatorsAlways = !settings?.showButtons
 
@@ -31,7 +36,9 @@ export default function TournamentCard({ title, layout, tournamentId }: Tourname
                 setShowParticipantCreator(value => !value)
               }}
             >
-              {showParticipantCreator ? "Hide Team Creator" : "Add Team"}
+              {showParticipantCreator
+                ? translations.participants.hideBtn[translationKey]
+                : translations.participants.addBtn[translationKey]}
             </PrimaryButton>
             <SecondaryButton
               onClick={() => {
