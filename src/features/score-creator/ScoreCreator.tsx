@@ -1,12 +1,12 @@
 import { useMemo, useRef, useState, type FormEvent, type RefObject, type ChangeEvent, type ReactElement } from "react"
-import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice.ts"
-import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
-import NumberInput from "@/app/components/inputs/NumberInput.tsx"
-import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
-import { useAppDispatch, useAppSelector } from "@/app/stateHooks.ts"
-import type { TournamentProps } from "@/app/types/tournament.ts"
+import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice"
+import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice"
+import NumberInput from "@/app/components/inputs/NumberInput"
+import PrimaryButton from "@/app/components/buttons/PrimaryButton"
+import { useAppDispatch, useAppSelector } from "@/app/stateHooks"
+import type { TournamentProps } from "@/app/types/tournament"
 import type { RootState } from "@/app/store"
-import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments.ts"
+import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournaments"
 
 export default function ScoreCreator({ tournamentId, settings }: TournamentProps) {
   const isPlayerMode = settings?.showAddPlayer === true
@@ -241,18 +241,21 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
         {canEnterScores && (
           <>
             {isPlayerMode ? (
-              <div className="row">
-                <label>
-                  <input type="checkbox" checked={homeParticipantWon} onChange={handleHomeWonChange} />
-                  <span>{homeParticipantName} won</span>
-                </label>
-                <label>
-                  <input type="checkbox" checked={awayParticipantWon} onChange={handleAwayWonChange} />
-                  <span>{awayParticipantName} won</span>
-                </label>
-              </div>
+              <>
+                <h3 className="text-center">Winner</h3>
+                <div className="checkbox-row">
+                  <label>
+                    <input type="checkbox" checked={homeParticipantWon} onChange={handleHomeWonChange} />
+                    <span>{homeParticipantName}</span>
+                  </label>
+                  <label>
+                    <input type="checkbox" checked={awayParticipantWon} onChange={handleAwayWonChange} />
+                    <span>{awayParticipantName}</span>
+                  </label>
+                </div>
+              </>
             ) : (
-              <div className="row">
+              <div className="checkbox-row">
                 <NumberInput
                   id={`homeScore-${tournamentId}`}
                   ref={homeScoreRef}

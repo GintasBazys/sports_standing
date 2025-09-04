@@ -1,5 +1,5 @@
-import { Layout } from "@/app/enumerators/layout.ts"
-import type { LayoutSettings, TournamentSettings } from "@/app/types/tournament.ts"
+import { Layout } from "@/app/enumerators/layout"
+import type { LayoutSettings, TournamentSettings } from "@/app/types/tournament"
 
 export const TOURNAMENTS: TournamentSettings[] = [
   { title: "Premier League", id: "premier-league", layout: Layout.CLEAN },

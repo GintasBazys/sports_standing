@@ -4,7 +4,7 @@ import { Provider } from "react-redux"
 import { store, persistor } from "@/app/store"
 import "@/assets/styles/main.scss"
 import { PersistGate } from "redux-persist/integration/react"
-import App from "@/app/components/App.tsx"
+import App from "@/app/components/App"
 
 const container = document.getElementById("root")
 

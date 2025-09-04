@@ -1,12 +1,12 @@
-import type { TournamentItem } from "@/app/types/tournament.ts"
-import { getLayoutSettings } from "@/app/utils/layout.ts"
+import type { TournamentItem } from "@/app/types/tournament"
+import { getLayoutSettings } from "@/app/utils/layout"
 import { useState } from "react"
-import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
-import SecondaryButton from "@/app/components/buttons/SecondaryButton.tsx"
-import ParticipantsCreator from "@/features/participant-creator/ParticipantsCreator.tsx"
-import ScoreCreator from "@/features/score-creator/ScoreCreator.tsx"
-import MatchResultsTable from "@/app/components/tables/MatchResultsTable.tsx"
-import StandingsTable from "@/app/components/tables/StandingsTable.tsx"
+import PrimaryButton from "@/app/components/buttons/PrimaryButton"
+import SecondaryButton from "@/app/components/buttons/SecondaryButton"
+import ParticipantsCreator from "@/features/participant-creator/ParticipantsCreator"
+import ScoreCreator from "@/features/score-creator/ScoreCreator"
+import MatchResultsTable from "@/app/components/tables/MatchResultsTable"
+import StandingsTable from "@/app/components/tables/StandingsTable"
 
 export default function TournamentCard({ title, layout, tournamentId }: TournamentItem) {
   const settings = getLayoutSettings(layout)

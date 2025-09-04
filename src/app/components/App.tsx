@@ -1,4 +1,4 @@
-import TournamentCards from "@/app/components/tournaments/TournamentCards.tsx"
+import TournamentCards from "@/app/components/tournaments/TournamentCards"
 
 export default function App() {
   return (

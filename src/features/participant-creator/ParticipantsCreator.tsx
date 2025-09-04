@@ -1,13 +1,13 @@
 import { type FormEvent, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { addParticipant, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
-import type { RootState } from "@/app/store.ts"
-import type { TournamentProps } from "@/app/types/tournament.ts"
-import { ParticipantTypes } from "@/app/enumerators/participant.ts"
+import { addParticipant, selectStandings } from "@/features/participant-creator/participantsSlice"
+import type { RootState } from "@/app/store"
+import type { TournamentProps } from "@/app/types/tournament"
+import { ParticipantTypes } from "@/app/enumerators/participant"
 import translations from "@/app/translations/en.json"
-import TextInput from "@/app/components/inputs/TextInput.tsx"
-import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
-import { MAX_ENTRY_LIMIT, MAX_NAME_LENGTH } from "@/app/constants/tournaments.ts"
+import TextInput from "@/app/components/inputs/TextInput"
+import PrimaryButton from "@/app/components/buttons/PrimaryButton"
+import { MAX_ENTRY_LIMIT, MAX_NAME_LENGTH } from "@/app/constants/tournaments"
 
 export default function ParticipantsCreator({ tournamentId, settings }: TournamentProps) {
   const dispatch = useDispatch()
@@ -86,7 +86,7 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
             <TextInput
               id={`participant-iso-${tournamentId}`}
               ref={isoRef}
-              placeholder="ISO country code (e.g., US)"
+              placeholder="ISO country code (optional)"
               maxLength={2}
             />
           )}

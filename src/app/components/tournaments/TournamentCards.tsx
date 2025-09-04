@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react"
 import { TOURNAMENTS } from "@/app/constants/tournaments"
 import TournamentCard from "@/app/components/tournaments/TournamentCard"
 import { Layout } from "@/app/enumerators/layout"
-import OutlineButton from "@/app/components/buttons/OutlineButton.tsx"
+import OutlineButton from "@/app/components/buttons/OutlineButton"
 
 export default function TournamentCards() {
   const [activeLayout, setActiveLayout] = useState<Layout>(() => TOURNAMENTS[0]?.layout ?? Layout.CLEAN)

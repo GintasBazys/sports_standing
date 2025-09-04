@@ -76,8 +76,14 @@ h1 {
   text-transform: uppercase;
 }
 
-.row {
-  @include flex-center;
+.checkbox-row {
+  word-break: break-all;
+  display: flex;
+  flex-direction: column;
+  input {
+    position: relative;
+    top: 0.125rem;
+  }
 }
 
 .input {
