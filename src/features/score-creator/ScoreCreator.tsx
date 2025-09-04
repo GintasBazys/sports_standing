@@ -247,7 +247,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
           <>
             {isPlayerMode ? (
               <>
-                <h3 className="text-center">Winner</h3>
+                <h3 className="text-center margin-0">{translations.scores.winner}</h3>
                 <div className="checkbox-row">
                   <label>
                     <input type="checkbox" checked={homeParticipantWon} onChange={handleHomeWonChange} />
@@ -282,7 +282,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             )}
             {errorMessage && <p className="error">{errorMessage}</p>}
             <PrimaryButton className="btn--full-width" type="submit" disabled={maxEntries}>
-              Save Result
+              {translations.scores.saveBtn}
             </PrimaryButton>
             {maxEntries && <p className="error margin-0">Max entry limit reached - {MAX_ENTRY_LIMIT}</p>}
           </>

@@ -7,7 +7,7 @@ import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import type { TournamentProps } from "@/app/types/tournament.ts"
 import translations from "@/app/translations/en.json"
 import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
-import type { MatchEntry } from "@/app/types/scores.ts"
+import type { MatchEntry } from "@/app/types/matches.ts"
 import ReactCountryFlag from "react-country-flag"
 
 export default function MatchResultsTable({ tournamentId, settings }: TournamentProps) {
@@ -61,7 +61,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
             {!definedMatches.length && (
               <tr>
                 <td className="text-center" colSpan={4}>
-                  No results found
+                  {translations.matches.empty}
                 </td>
               </tr>
             )}

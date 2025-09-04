@@ -45,7 +45,7 @@ export default function TournamentCard({ title, layout, tournamentId }: Tourname
                 setShowScoreCreator(value => !value)
               }}
             >
-              {showScoreCreator ? "Hide Score Creator" : "Add Score"}
+              {showScoreCreator ? translations.scores.hideBtn : translations.scores.addBtn}
             </SecondaryButton>
           </div>
         )}

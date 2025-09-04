@@ -1,6 +1,6 @@
 import { createSlice, createSelector, nanoid, type PayloadAction } from "@reduxjs/toolkit"
 import type { RootState } from "@/app/store.ts"
-import type { MatchData, ScoresState } from "@/app/types/scores.ts"
+import type { MatchData, ScoresState } from "@/app/types/matches.ts"
 
 const initialState: ScoresState = { byTournament: {} }
 
