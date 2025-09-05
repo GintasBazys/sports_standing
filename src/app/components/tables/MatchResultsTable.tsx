@@ -44,7 +44,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
   useTableAutoScroll(tbodyRef, wrapperRef)
 
   if (!tournamentId) {
-    return
+    return null
   }
 
   return (
