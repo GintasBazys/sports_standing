@@ -1,4 +1,7 @@
 {
+  "general": {
+    "entry_limit": "Max entry limit reached"
+  },
   "headings": {
     "standings": "Standings",
     "results": "Match Results"
@@ -41,7 +44,8 @@
     },
     "placeholder": {
       "team": "Team name",
-      "player": "Player name"
+      "player": "Player name",
+      "iso": "ISO country code (optional)"
     },
     "addBtn": {
       "team": "Add Team",
@@ -53,13 +57,14 @@
     },
     "errors": {
       "empty": {
-        "team": "Please enter a team name",
-        "player": "Please enter a player name"
+        "team": "Enter a team name",
+        "player": "Enter a player name"
       },
       "duplicate": {
         "team": "That team name already exists",
         "player": "That player name already exists"
-      }
+      },
+      "iso": "Enter a valid 2-letter ISO 3166-1 code (e.g., US, GB, LT)"
     }
   },
   "scores": {
@@ -81,8 +86,8 @@
     "noOpponents": "No opponents available",
     "winner": "Winner",
     "saveBtn": "Save Result",
-    "addBtn": "Add Score",
-    "hideBtn": "Hide Score Creator",
+    "addBtn": "Add Match",
+    "hideBtn": "Hide Match Creator",
     "errors": {
       "pickDifferent": {
         "team": "Pick two different teams",

@@ -18,6 +18,8 @@ table {
 
   tbody {
     tr {
+      scroll-margin-top: 40px;//sticky thead
+
       &:nth-child(even) {
         background-color: var(--table-row-even-bg);
       }
@@ -46,7 +48,7 @@ table {
 
 .scrollable-x {
   overflow: auto;
-  max-height: 22rem;
+  max-height: 300px;
 }
 
 .grid {

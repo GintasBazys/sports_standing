@@ -1,24 +1,26 @@
 import { createSlice, createSelector, nanoid, type PayloadAction } from "@reduxjs/toolkit"
 import type { RootState } from "@/app/store.ts"
-import type { MatchData, ScoresState } from "@/app/types/matches.ts"
+import type { MatchAddPayload, MatchData, MatchScorePayload, ScoresState } from "@/app/types/matches.ts"
 
 const initialState: ScoresState = { byTournament: {} }
 
-const makePairKey = (teamAId: string, teamBId: string) => [teamAId, teamBId].sort().join("::")
+function makePairKey(teamAId: string, teamBId: string): string {
+  return [teamAId, teamBId].sort().join("::")
+}
 
-const getOrCreateTournamentData = (state: ScoresState, tournamentId: string): MatchData => {
+function getOrCreateTournamentData(state: ScoresState, tournamentId: string): MatchData {
   return state.byTournament[tournamentId] ?? (state.byTournament[tournamentId] = { matches: {}, matchOrder: [] })
 }
 
-export const scoresSlice = createSlice({
-  name: "scores",
+export const matchesSlice = createSlice({
+  name: "matches",
   initialState,
   reducers: create => ({
     createMatch: create.preparedReducer(
       (tournamentId: string, homeId: string, awayId: string) => ({
         payload: { id: nanoid(), tournamentId, homeId, awayId }
       }),
-      (state, action: PayloadAction<{ id: string; tournamentId: string; homeId: string; awayId: string }>) => {
+      (state, action: PayloadAction<MatchAddPayload>) => {
         const { id: matchId, tournamentId, homeId, awayId } = action.payload
 
         if (homeId === awayId) {
@@ -56,10 +58,7 @@ export const scoresSlice = createSlice({
       (tournamentId: string, matchId: string, homeScore: number, awayScore: number) => ({
         payload: { tournamentId, matchId, homeScore, awayScore }
       }),
-      (
-        state,
-        action: PayloadAction<{ tournamentId: string; matchId: string; homeScore: number; awayScore: number }>
-      ) => {
+      (state, action: PayloadAction<MatchScorePayload>) => {
         const { tournamentId, matchId, homeScore, awayScore } = action.payload
         const matchEntry = state.byTournament[tournamentId]?.matches[matchId]
 
@@ -74,10 +73,10 @@ export const scoresSlice = createSlice({
   })
 })
 
-export const { createMatch, setMatchScores } = scoresSlice.actions
-export default scoresSlice.reducer
+export const { createMatch, setMatchScores } = matchesSlice.actions
+export default matchesSlice.reducer
 
-const selectScoresState = (state: RootState) => state.scores
+const selectScoresState = (state: RootState) => state.matches
 const selectByTournament = createSelector(selectScoresState, scoresState => scoresState.byTournament)
 
 const selectTournamentId = (_: RootState, tournamentId?: string) => tournamentId

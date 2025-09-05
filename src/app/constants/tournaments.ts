@@ -54,7 +54,24 @@ export const LAYOUT_SETTINGS: LayoutSettings[] = [
   }
 ]
 
+export const DEFAULT_LAYOUT_SETTINGS = {
+  name: Layout.CLEAN,
+  showAddTeam: true,
+  showAddPlayer: false,
+  showStandings: true,
+  showMatchResults: false,
+  showButtons: false,
+  showFlags: false,
+  showWinLoseIcons: false,
+  showPlayed: true,
+  showWins: true,
+  showDraws: true,
+  showLosses: true,
+  showPoints: true
+}
+
 export const MAX_SCORE = 99
 export const MIN_SCORE = 0
 export const MAX_NAME_LENGTH = 250
 export const MAX_ENTRY_LIMIT = 100
+export const MAX_TABLE_HEIGHT = 300 //matches css

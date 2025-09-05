@@ -15,7 +15,7 @@ body {
   font-family: Inter, sans-serif;
   position: relative;
   min-height: 100vh;
-  background: url("@/assets/images/bg-sport.webp") no-repeat center center fixed;
+  background: url("@/assets/images/bg-sport.webp") no-repeat center center scroll;
   background-size: cover;
 
   &::before {

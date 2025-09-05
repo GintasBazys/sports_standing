@@ -1,5 +1,4 @@
 import { type FormEvent, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
 import { addParticipant, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import type { RootState } from "@/app/store.ts"
 import type { TournamentProps } from "@/app/types/tournament.ts"
@@ -8,17 +7,18 @@ import translations from "@/app/translations/en.json"
 import TextInput from "@/app/components/inputs/TextInput.tsx"
 import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
 import { MAX_ENTRY_LIMIT, MAX_NAME_LENGTH } from "@/app/constants/tournaments.ts"
+import { useAppDispatch, useAppSelector } from "@/app/stateHooks.ts"
 
 export default function ParticipantsCreator({ tournamentId, settings }: TournamentProps) {
-  const dispatch = useDispatch()
-  const standings = useSelector<RootState, ReturnType<typeof selectStandings>>(state =>
+  const dispatch = useAppDispatch()
+  const standings = useAppSelector<RootState, ReturnType<typeof selectStandings>>(state =>
     selectStandings(state, tournamentId)
   )
   const inputRef = useRef<HTMLInputElement | null>(null)
   const isoRef = useRef<HTMLInputElement | null>(null)
   const [error, setError] = useState<string | null>(null)
 
-  const translationKey = settings?.showAddPlayer ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
+  const translationKey = settings.showAddPlayer ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   function handleAddParticipant(e: FormEvent): void {
     e.preventDefault()
@@ -47,11 +47,11 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
 
     let iso_code: string | undefined
 
-    if (settings?.showFlags && isoEl) {
+    if (settings.showFlags && isoEl) {
       const raw = isoEl.value
 
       if (raw.length > 0 && !/^[A-Za-z]{2}$/.test(raw)) {
-        setError("Please enter a valid 2-letter ISO 3166-1 code (e.g., US, GB, LT).")
+        setError(translations.participants.errors.iso)
 
         return
       }
@@ -82,11 +82,11 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
             maxLength={MAX_NAME_LENGTH}
           />
 
-          {settings?.showFlags && (
+          {settings.showFlags && (
             <TextInput
               id={`participant-iso-${tournamentId}`}
               ref={isoRef}
-              placeholder="ISO country code (optional)"
+              placeholder={translations.participants.placeholder.iso}
               maxLength={2}
             />
           )}
@@ -95,7 +95,11 @@ export default function ParticipantsCreator({ tournamentId, settings }: Tourname
         <PrimaryButton className="btn--full-width" type="submit" disabled={maxEntries}>
           {translations.participants.addBtn[translationKey]}
         </PrimaryButton>
-        {maxEntries && <p className="error margin-0">Max entry limit reached - {MAX_ENTRY_LIMIT}</p>}
+        {maxEntries && (
+          <p className="error margin-0">
+            {translations.general.entry_limit} - {MAX_ENTRY_LIMIT}
+          </p>
+        )}
       </form>
     </div>
   )

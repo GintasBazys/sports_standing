@@ -5,8 +5,8 @@ import { Layout } from "@/app/enumerators/layout.ts"
 import OutlineButton from "@/app/components/buttons/OutlineButton.tsx"
 
 export default function TournamentCards() {
-  const [activeLayout, setActiveLayout] = useState<Layout>(() => TOURNAMENTS[0]?.layout ?? Layout.CLEAN)
-  const [isMobile, setIsMobile] = useState(false)
+  const [activeLayout, setActiveLayout] = useState<Layout>(Layout.CLEAN)
+  const [isMobile, setIsMobile] = useState<boolean>(false)
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(max-width: 1024px)")

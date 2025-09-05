@@ -1,5 +1,10 @@
 import { createSelector, createSlice, nanoid, type PayloadAction } from "@reduxjs/toolkit"
-import type { ParticipantState, tournamentData } from "@/app/types/participant.ts"
+import type {
+  ParticipantAddPayload,
+  ParticipantRecordPayload,
+  ParticipantState,
+  tournamentData
+} from "@/app/types/participant.ts"
 import type { RootState } from "@/app/store.ts"
 
 const initialState: ParticipantState = {
@@ -14,7 +19,7 @@ export const participantsSlice = createSlice({
       (name: string, tournamentId: string, iso_code?: string) => {
         return { payload: { id: nanoid(), name, tournamentId, iso_code } }
       },
-      (state, action: PayloadAction<{ id: string; name: string; tournamentId: string; iso_code?: string }>) => {
+      (state, action: PayloadAction<ParticipantAddPayload>) => {
         const { id, name, tournamentId, iso_code } = action.payload
         const tournamentData =
           state.byTournament[tournamentId] ?? (state.byTournament[tournamentId] = { teams: {}, teamOrder: [] })
@@ -22,7 +27,7 @@ export const participantsSlice = createSlice({
         const exists = tournamentData.teamOrder.some(tid => {
           const entry = tournamentData.teams[tid]
 
-          return entry?.name.toLowerCase() === name.toLowerCase()
+          return entry?.name === name
         })
 
         if (exists) {
@@ -43,16 +48,7 @@ export const participantsSlice = createSlice({
           awayScore: Math.max(0, Math.trunc(awayScore))
         }
       }),
-      (
-        state,
-        action: PayloadAction<{
-          tournamentId: string
-          homeId: string
-          awayId: string
-          homeScore: number
-          awayScore: number
-        }>
-      ) => {
+      (state, action: PayloadAction<ParticipantRecordPayload>) => {
         const { tournamentId, homeId, awayId, homeScore, awayScore } = action.payload
 
         const tournamentData = state.byTournament[tournamentId]

@@ -25,7 +25,7 @@ export type TournamentSettings = {
 
 export type TournamentProps = {
   tournamentId: string
-  settings: LayoutSettings | undefined
+  settings: LayoutSettings
 }
 
 export type ButtonProps = ComponentProps<"button">

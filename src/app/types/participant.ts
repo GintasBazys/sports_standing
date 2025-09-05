@@ -15,3 +15,18 @@ export type tournamentData = {
 export type ParticipantState = {
   byTournament: Record<string, tournamentData>
 }
+
+export type ParticipantAddPayload = {
+  id: string
+  name: string
+  tournamentId: string
+  iso_code?: string
+}
+
+export type ParticipantRecordPayload = {
+  tournamentId: string
+  homeId: string
+  awayId: string
+  homeScore: number
+  awayScore: number
+}

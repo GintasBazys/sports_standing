@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type FormEvent, type RefObject, type ChangeEvent, type ReactElement } from "react"
-import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/score-creator/scoresSlice.ts"
+import { createMatch, setMatchScores, selectOpponentsPlayed } from "@/features/match-creator/matchesSlice.ts"
 import { recordResult, selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import NumberInput from "@/app/components/inputs/NumberInput.tsx"
 import PrimaryButton from "@/app/components/buttons/PrimaryButton.tsx"
@@ -10,9 +10,7 @@ import { MAX_ENTRY_LIMIT, MAX_SCORE, MIN_SCORE } from "@/app/constants/tournamen
 import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import translations from "@/app/translations/en.json"
 
-export default function ScoreCreator({ tournamentId, settings }: TournamentProps) {
-  const isPlayerMode = settings?.showAddPlayer === true
-
+export default function MatchesCreator({ tournamentId, settings }: TournamentProps) {
   const dispatch = useAppDispatch()
 
   function selectParticipantsForTournament(state: RootState) {
@@ -45,6 +43,14 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
     return options
   }, [participants])
 
+  const filteredHomeOptions = useMemo(() => {
+    if (!awayParticipantId) {
+      return participantOptions
+    }
+
+    return participantOptions.filter(option => option.id !== awayParticipantId)
+  }, [participantOptions, awayParticipantId])
+
   const canEnterScores = homeParticipantId !== "" && awayParticipantId !== "" && homeParticipantId !== awayParticipantId
 
   function selectOpponentsForHome(state: RootState): Set<string> {
@@ -73,7 +79,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
     return participantOptions.filter(option => !unavailableAwayIds.has(option.id))
   }, [homeParticipantId, participantOptions, unavailableAwayIds])
 
-  function clampScoreFromRef(inputRef: RefObject<HTMLInputElement | null>, maxScore = MAX_SCORE): number {
+  function removeNumberFractionalPart(inputRef: RefObject<HTMLInputElement | null>, maxScore = MAX_SCORE): number {
     const rawValue = Number(inputRef.current?.value)
     const truncated = Math.trunc(rawValue)
 
@@ -89,13 +95,13 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
       return
     }
 
-    const homeScore = clampScoreFromRef(homeScoreRef, MAX_SCORE)
-    const awayScore = clampScoreFromRef(awayScoreRef, MAX_SCORE)
+    const homeScore = removeNumberFractionalPart(homeScoreRef, MAX_SCORE)
+    const awayScore = removeNumberFractionalPart(awayScoreRef, MAX_SCORE)
 
     let standingsHome = homeScore
     let standingsAway = awayScore
 
-    if (isPlayerMode) {
+    if (isPlayersOnly) {
       if (homeParticipantWon === awayParticipantWon) {
         setErrorMessage(translations.scores.errors.winnerRequired)
 
@@ -183,7 +189,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
   const awayParticipantName = getParticipantNameById(participantOptions, awayParticipantId, "Away")
   const maxEntries = participants.length >= MAX_ENTRY_LIMIT
 
-  const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
+  const isPlayersOnly = settings.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
   return (
@@ -196,12 +202,12 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             id={`homeOptions-${tournamentId}`}
             value={homeParticipantId}
             onChange={handleHomeSelectChange}
-            disabled={participantOptions.length === 0}
+            disabled={filteredHomeOptions.length === 0}
           >
             <option value="" disabled>
               {translations.scores.selectPlaceholder[translationKey]}
             </option>
-            {participantOptions.map(renderParticipantOption)}
+            {filteredHomeOptions.map(renderParticipantOption)}
           </select>
           <svg className="arrow" viewBox="0 0 16 16">
             <path
@@ -245,7 +251,7 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
         </div>
         {canEnterScores && (
           <>
-            {isPlayerMode ? (
+            {isPlayersOnly ? (
               <>
                 <h3 className="text-center margin-0">{translations.scores.winner}</h3>
                 <div className="checkbox-row">
@@ -284,7 +290,11 @@ export default function ScoreCreator({ tournamentId, settings }: TournamentProps
             <PrimaryButton className="btn--full-width" type="submit" disabled={maxEntries}>
               {translations.scores.saveBtn}
             </PrimaryButton>
-            {maxEntries && <p className="error margin-0">Max entry limit reached - {MAX_ENTRY_LIMIT}</p>}
+            {maxEntries && (
+              <p className="error margin-0">
+                {translations.general.entry_limit} - {MAX_ENTRY_LIMIT}
+              </p>
+            )}
           </>
         )}
       </form>

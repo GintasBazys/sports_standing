@@ -1,26 +1,26 @@
-import { useMemo } from "react"
-import { useSelector } from "react-redux"
-import { selectMatches } from "@/features/score-creator/scoresSlice.ts"
+import { useMemo, useRef } from "react"
+import { selectMatches } from "@/features/match-creator/matchesSlice.ts"
 import { selectStandings } from "@/features/participant-creator/participantsSlice.ts"
 import type { RootState } from "@/app/store.ts"
 import { ParticipantTypes } from "@/app/enumerators/participant.ts"
 import type { TournamentProps } from "@/app/types/tournament.ts"
 import translations from "@/app/translations/en.json"
-import { useAutoScroll } from "@/app/hooks/useAutoScroll.ts"
+import { useTableAutoScroll } from "@/app/hooks/useTableAutoScroll.ts"
 import type { MatchEntry } from "@/app/types/matches.ts"
 import ReactCountryFlag from "react-country-flag"
+import { useAppSelector } from "@/app/stateHooks.ts"
 
 export default function MatchResultsTable({ tournamentId, settings }: TournamentProps) {
-  const matches = useSelector<RootState, ReturnType<typeof selectMatches>>((state: RootState) =>
+  const matches = useAppSelector<RootState, ReturnType<typeof selectMatches>>((state: RootState) =>
     selectMatches(state, tournamentId)
   )
 
-  const standings = useSelector<RootState, ReturnType<typeof selectStandings>>((state: RootState) =>
+  const standings = useAppSelector<RootState, ReturnType<typeof selectStandings>>((state: RootState) =>
     selectStandings(state, tournamentId)
   )
 
-  const nameAndFlagById = useMemo<Map<string, { name: string; isoCode: string | undefined }>>(() => {
-    const participantsById = new Map<string, { name: string; isoCode: string | undefined }>()
+  const nameAndFlagById = useMemo<Map<string, { name: string; isoCode?: string }>>(() => {
+    const participantsById = new Map<string, { name: string; isoCode?: string }>()
 
     for (const participant of standings) {
       if (!participant.id) {
@@ -35,10 +35,13 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
 
   const definedMatches = useMemo<MatchEntry[]>(() => matches.filter(matchEntry => matchEntry != null), [matches])
 
-  const isPlayersOnly = settings?.showAddPlayer && !settings.showAddTeam
+  const isPlayersOnly = settings.showAddPlayer && !settings.showAddTeam
   const translationKey: ParticipantTypes = isPlayersOnly ? ParticipantTypes.PLAYER : ParticipantTypes.TEAM
 
-  const setRowRef = useAutoScroll(definedMatches)
+  const tbodyRef = useRef<HTMLTableSectionElement>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+
+  useTableAutoScroll(tbodyRef, wrapperRef)
 
   if (!tournamentId) {
     return
@@ -47,7 +50,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
   return (
     <>
       <h3>{translations.headings.results}</h3>
-      <div className="scrollable-x">
+      <div ref={wrapperRef} className="scrollable-x">
         <table>
           <thead>
             <tr>
@@ -57,7 +60,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
               <th>{translations.headers.away[translationKey]}</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody ref={tbodyRef}>
             {!definedMatches.length && (
               <tr>
                 <td className="text-center" colSpan={4}>
@@ -77,11 +80,11 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
                 : { name: "—", isoCode: undefined }
 
               return (
-                <tr key={match.id} ref={setRowRef(match.id)}>
+                <tr key={match.id}>
                   <td>{index + 1}</td>
                   <td>
                     <div className="wrapper">
-                      {settings?.showFlags && home.isoCode && (
+                      {settings.showFlags && home.isoCode && (
                         <ReactCountryFlag className="country-flag" countryCode={home.isoCode} />
                       )}
                       {home.name}
@@ -94,7 +97,7 @@ export default function MatchResultsTable({ tournamentId, settings }: Tournament
                   </td>
                   <td>
                     <div className="wrapper">
-                      {settings?.showFlags && away.isoCode && (
+                      {settings.showFlags && away.isoCode && (
                         <ReactCountryFlag className="country-flag" countryCode={away.isoCode} />
                       )}
                       {away.name}
